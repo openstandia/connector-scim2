@@ -1,6 +1,6 @@
 package com.exclamationlabs.connid.base.scim2.model.response.fault;
 
-public class ErrorResponseCode {
+public interface ErrorResponseCode {
   int PAID_SUBSCRIPTION_REQUIRED = 200;
   int VALIDATION_FAILED = 300;
 

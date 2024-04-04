@@ -1,10 +1,13 @@
 package com.exclamationlabs.connid.base.scim2.model.request;
 
-import lombok.Builder;
-import lombok.Data;
-
-@Data
-@Builder
 public class UserStatusChangeRequest {
   private String action;
+
+  public String getAction() {
+    return action;
+  }
+
+  public void setAction(String action) {
+    this.action = action;
+  }
 }

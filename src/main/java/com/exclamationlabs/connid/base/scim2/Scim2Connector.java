@@ -28,7 +28,7 @@ public class Scim2Connector extends BaseFullAccessConnector<Scim2Configuration> 
 
               @Override
               public Map<String, String> getAdditionalFormFields() {
-                return Collections.singletonMap("scim2UserUrl", configuration.getScim2UserUrl());
+                return Collections.singletonMap("scim2UserUrl", configuration.getSchemaUrl());
               }
             });
     setDriver(new Scim2Driver());

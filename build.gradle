@@ -56,7 +56,13 @@ dependencies {
     // Required for MidPoint runtime
     runtimeOnly 'org.codehaus.groovy:groovy:2.5.21'
     runtimeOnly 'com.evolveum.polygon:connector-common:1.5.0.0'
-    compileOnly 'org.projectlombok:lombok:1.18.30'
+
+    // Lombok Related
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.32'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
 
     // HTTP/RESTful support
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -65,6 +71,8 @@ dependencies {
     implementation 'commons-codec:commons-codec:1.15'
 
     implementation "com.exclamationlabs.connid:connector-base:${base_connector_version}-+"
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.2.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
 
     testImplementation "com.exclamationlabs.connid:connector-base-test-support:${test_connector_version}-+"
 
