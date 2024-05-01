@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 public class Meta {
 
   @JsonProperty("resourceType")
-  private String resourceType;
+  String resourceType;
 
   @JsonProperty("location")
-  private String location;
+  String location;
 }

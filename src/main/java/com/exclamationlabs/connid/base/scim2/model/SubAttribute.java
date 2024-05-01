@@ -32,35 +32,35 @@ import lombok.NoArgsConstructor;
 public class SubAttribute {
 
   @JsonProperty("name")
-  private String name;
+  String name;
 
   @JsonProperty("type")
-  private String type;
+  String type;
 
   @JsonProperty("multiValued")
-  private Boolean multiValued;
+  Boolean multiValued;
 
   @JsonProperty("description")
-  private String description;
+  String description;
 
   @JsonProperty("required")
-  private Boolean required;
+  Boolean required;
 
   @JsonProperty("caseExact")
-  private Boolean caseExact;
+  Boolean caseExact;
 
   @JsonProperty("mutability")
-  private String mutability;
+  String mutability;
 
   @JsonProperty("returned")
-  private String returned;
+  String returned;
 
   @JsonProperty("uniqueness")
-  private String uniqueness;
+  String uniqueness;
 
   @JsonProperty("canonicalValues")
-  private List<String> canonicalValues;
+  List<String> canonicalValues;
 
   @JsonProperty("referenceTypes")
-  private List<String> referenceTypes;
+  List<String> referenceTypes;
 }

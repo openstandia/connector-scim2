@@ -36,48 +36,6 @@ public class Scim2ConnectorApiIntegrationTest
 
   @BeforeEach
   public void setup() {
-    /* System.out.println("This is getting called");
-    String jsonFilePath = "/Users/sdaka/Desktop/DSR/work/iamscim2/src/test/resources/Schema_raw_JSON.json";
-    ObjectMapper objectMapper = new ObjectMapper();
-    List<Scim2Schema> schemaPojo = null;
-    try {
-        schemaPojo = objectMapper.readValue(new File(jsonFilePath), new TypeReference<List<Scim2Schema>>() {});
-    } catch (IOException e) {
-        throw new RuntimeException(e);
-    }
-
-    // Now you can use the pojo object, which contains the data from the JSON file
-    System.out.println("Data from JSON file:");
-    System.out.println(schemaPojo);
-
-    Set<ConnectorAttribute> result = new HashSet<>();
-
-    schemaPojo.forEach(obj->{
-
-        boolean user = obj.getName().equalsIgnoreCase("User");
-
-
-        if(user){
-            List<com.exclamationlabs.connid.base.scim2.model.Attribute> userAttributes = obj.getAttributes();
-            for (com.exclamationlabs.connid.base.scim2.model.Attribute userAttribute : userAttributes) {
-                AttributeInfo.Flags req = userAttribute.getRequired() ? REQUIRED : NOT_READABLE;
-                String STRING_TYPE = userAttribute.getType().equalsIgnoreCase("string") ? "STRING" : "";
-
-                if(userAttribute.getSubAttributes()!=null && !userAttribute.getSubAttributes().isEmpty()){
-                    for (com.exclamationlabs.connid.base.scim2.model.SubAttribute subAttribute : userAttribute.getSubAttributes()) {
-                       // String STRING_TYPE_INNER = userAttribute.getType().equalsIgnoreCase("string") ? "STRING" : "";
-                        result.add(new ConnectorAttribute(subAttribute.getName(), ConnectorAttributeDataType.valueOf("STRING")));
-                    }
-
-                }
-
-                result.add(new ConnectorAttribute(userAttribute.getName(), ConnectorAttributeDataType.valueOf("STRING"), req));
-            }
-        }
-    });
-
-    System.out.println("result is  "+result);*/
-
     super.setup();
   }
 
@@ -91,6 +49,23 @@ public class Scim2ConnectorApiIntegrationTest
   @Order(60)
   public void test060Schema() {
     assertNotNull(getConnectorFacade().schema());
+  }
+
+  @Test
+  @Order(100)
+  public void test100UserCreate() {
+    // Creates a 'pending' user that will be deleted at the end
+    Set<Attribute> attributes = new HashSet<>();
+    /*attributes.add(new AttributeBuilder().setName(FIRST_NAME.name()).addValue(firstName).build());
+    attributes.add(new AttributeBuilder().setName(LAST_NAME.name()).addValue(lastName).build());
+    attributes.add(new AttributeBuilder().setName(TYPE.name()).addValue(UserType.BASIC).build());
+    attributes.add(new AttributeBuilder().setName(EMAIL.name()).addValue(userEmail).build());*/
+    Uid newId =
+            getConnectorFacade()
+                    .create(ObjectClass.ACCOUNT, attributes, new OperationOptionsBuilder().build());
+    assertNotNull(newId);
+    assertNotNull(newId.getUidValue());
+    //generatedUserId = newId.getUidValue();
   }
 
   @Test

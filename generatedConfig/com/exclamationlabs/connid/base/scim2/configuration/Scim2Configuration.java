@@ -74,6 +74,10 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationInfo(path="security.authenticator.oauth2ClientCredentials.oauth2Information", internal=true)
     private Map<String,String> oauth2Information;
 
+    @NotBlank(message="accountId cannot be blank")
+    @ConfigurationInfo(path="custom.accountId")
+    private String accountId;
+
     @ConfigurationInfo(path="service.duplicateErrorReturnsId")
     private Boolean duplicateErrorReturnsId = false;
 
@@ -257,6 +261,20 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
 
     public void setOauth2Information(Map<String,String> input) {
         this.oauth2Information = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Zoom Account Id",
+    helpMessageKey = "Zoom Account Id required for authentication.",
+    order = 701,
+    confidential = false,
+    required = true)
+    public String getAccountId() {
+        return this.accountId;
+    }
+
+    public void setAccountId(String input) {
+        this.accountId = input;
     }
 
     @ConfigurationProperty(

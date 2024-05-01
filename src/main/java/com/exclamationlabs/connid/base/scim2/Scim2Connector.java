@@ -4,6 +4,7 @@ import com.exclamationlabs.connid.base.connector.BaseFullAccessConnector;
 import com.exclamationlabs.connid.base.connector.authenticator.Authenticator;
 import com.exclamationlabs.connid.base.connector.authenticator.OAuth2TokenClientCredentialsAuthenticator;
 import com.exclamationlabs.connid.base.scim2.adapter.Scim2GroupsAdapter;
+import com.exclamationlabs.connid.base.scim2.adapter.Scim2StandardUserAdapter;
 import com.exclamationlabs.connid.base.scim2.adapter.Scim2UsersAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2Driver;
@@ -28,10 +29,10 @@ public class Scim2Connector extends BaseFullAccessConnector<Scim2Configuration> 
 
               @Override
               public Map<String, String> getAdditionalFormFields() {
-                return Collections.singletonMap("scim2UserUrl", configuration.getSchemaUrl());
+                return Collections.singletonMap("account_id", configuration.getAccountId());
               }
             });
     setDriver(new Scim2Driver());
-    setAdapters(new Scim2UsersAdapter(), new Scim2GroupsAdapter());
+    setAdapters(new Scim2StandardUserAdapter(), new Scim2GroupsAdapter());
   }
 }
