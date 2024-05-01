@@ -1,20 +1,16 @@
 package com.exclamationlabs.connid.base.scim2.adapter;
 
-import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
-import com.exclamationlabs.connid.base.scim2.attribute.Scim2UserAttribute;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
 import org.identityconnectors.framework.common.objects.ObjectClass;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -22,8 +18,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.exclamationlabs.connid.base.scim2.attribute.Scim2UserAttribute.USERNAME;
-import static org.apache.commons.lang3.reflect.FieldUtils.getDeclaredField;
+
 
 public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Configuration> {
 
@@ -63,9 +58,6 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
-        //Set<ConnectorAttribute> result = new HashSet<>();
         result = new HashSet<>();
 
         schemaPojo.forEach(
@@ -164,8 +156,7 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
                 }else if( obj instanceof Scim2Addresses){
                     user.setScim2Addresses((Scim2Addresses) obj);
                 }
-                System.out.println("Attributes "+miniSet);
-                continue;
+                continue;  //For complex type objects -  as we are working on all elements of complex type, so need to further going, that is the reason we have 'continue' here
             }
 
 
@@ -173,7 +164,7 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
                 field.setAccessible(true); // Set field accessible since it's private
 
                 // Get the value of the field from the attribute object
-                Object value = null;
+                Object value;
                 try {
                     value = field.get(attr);
                 } catch (IllegalAccessException e) {
@@ -202,18 +193,6 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
                     System.out.println("Field " + field.getName() + " does not exist in User class.");
                 }
             }
-            System.out.println("User: " + user);
-
-            /*if(attr.getName().equalsIgnoreCase("userName")){
-                user.setUserName(AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, USERNAME));
-            }
-            if(attr.getName().startsWith("NAME_")){
-                Scim2UserName scim2UserName = new Scim2UserName();
-                scim2UserName.setFormatted(AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, Scim2UserAttribute.Scim2UserName));
-                user.setUserName(AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, USERNAME));
-
-                user.setScim2UserName(scim2UserName);
-            }*/
         }
         return user;
     }
@@ -235,7 +214,6 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
         try {
             Class<?> clazz = Class.forName("com.exclamationlabs.connid.base.scim2.model."+className);
             dd =  clazz.getDeclaredConstructor().newInstance();
-            //List<String> methodNames = Arrays.asList("Name","Display","Value","Type");
             List<String> methodNames = Arrays.asList("Name","Display","Value","Type","Formatted",
                     "FamilyName","GivenName","MiddleName","HonorificPrefix","HonorificSuffix",
                     "Streetaddress","Locality","Region","Postalcode","Country");
@@ -246,17 +224,11 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
                 try {
                     Field userField = clazz.getDeclaredField(lowerizeFirstLetter(methodName.toLowerCase()));
                     userField.setAccessible(true); // Set field accessible since it's private
-                    //userField.set(dd,userField);
                     userField.set(dd, methodName.toLowerCase());
                 }catch (NoSuchFieldException ex){
                     System.out.println("Eating Exception "+ex.getMessage());
                 }
             }
-            //Field userField = Scim2User.class.getDeclaredField(lowerizeFirstLetter(className));
-
-
-            /*Can not set com.exclamationlabs.connid.base.scim2.model.Scim2Entitlements field
-            com.exclamationlabs.connid.base.scim2.model.Scim2User.scim2Entitlements to com.exclamationlabs.connid.base.scim2.model.Scim2Entitlements*/
 
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException |
