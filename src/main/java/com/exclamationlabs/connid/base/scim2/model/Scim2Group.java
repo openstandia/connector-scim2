@@ -22,11 +22,11 @@ public class Scim2Group implements IdentityModel {
 
   @Override
   public String getIdentityIdValue() {
-     return getId();
+    return getId();
   }
 
   @Override
   public String getIdentityNameValue() {
-       return getName();
+    return getName();
   }
 }

@@ -7,7 +7,7 @@ import lombok.Data;
 public class Scim2User implements IdentityModel {
 
   private String userName;
-  //private String name;
+  // private String name;
 
   private Scim2Name scim2Name;
   private Scim2Addresses scim2Addresses;
@@ -22,7 +22,8 @@ public class Scim2User implements IdentityModel {
   private String timezone;
   private boolean active;
   private String password;
-  //private List<Scim2CustomType> scim2CustomType; //covers for emails/phonenumbers/ims/photos/entitlements/roles/x509Certificates
+  // private List<Scim2CustomType> scim2CustomType; //covers for
+  // emails/phonenumbers/ims/photos/entitlements/roles/x509Certificates
 
   private Scim2Emails scim2Emails;
   private Scim2PhoneNumbers scim2PhoneNumbers;
@@ -34,6 +35,7 @@ public class Scim2User implements IdentityModel {
 
   private String id;
   private String email;
+
   @Override
   public String getIdentityIdValue() {
     return id;
@@ -43,8 +45,4 @@ public class Scim2User implements IdentityModel {
   public String getIdentityNameValue() {
     return email;
   }
-
-
 }
-
-

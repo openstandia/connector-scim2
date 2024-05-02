@@ -40,20 +40,16 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationInfo(path="results.deepGet")
     private Boolean deepGet;
 
+    @NotBlank(message="userSchemaIdList cannot be blank")
+    @ConfigurationInfo(path="custom.userSchemaIdList")
+    private String userSchemaIdList;
+
     @ConfigurationInfo(path="results.pagination")
     private Boolean pagination;
 
     @NotBlank(message="tokenUrl cannot be blank")
     @ConfigurationInfo(path="security.authenticator.oauth2ClientCredentials.tokenUrl")
     private String tokenUrl;
-
-    @NotBlank(message="clientId cannot be blank")
-    @ConfigurationInfo(path="security.authenticator.oauth2ClientCredentials.clientId")
-    private String clientId;
-
-    @NotNull(message="standardUser cannot be null")
-    @ConfigurationInfo(path="custom.standardUser")
-    private Boolean standardUser = true;
 
     @NotBlank(message="serviceUrl cannot be blank")
     @ConfigurationInfo(path="service.serviceUrl")
@@ -63,35 +59,23 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationInfo(path="results.importBatchSize")
     private Integer importBatchSize = 50;
 
-    @NotBlank(message="resourceTypeRawJson cannot be blank")
-    @ConfigurationInfo(path="custom.resourceTypeRawJson")
-    private String resourceTypeRawJson;
+    @NotBlank(message="groupSchemaIDList cannot be blank")
+    @ConfigurationInfo(path="custom.groupSchemaIDList")
+    private String groupSchemaIDList;
 
-    @NotBlank(message="schemaUrl cannot be blank")
-    @ConfigurationInfo(path="custom.schemaUrl")
-    private String schemaUrl;
+    @NotNull(message="enableStandardSchema cannot be null")
+    @ConfigurationInfo(path="custom.enableStandardSchema")
+    private Boolean enableStandardSchema = false;
 
     @ConfigurationInfo(path="security.authenticator.oauth2ClientCredentials.oauth2Information", internal=true)
     private Map<String,String> oauth2Information;
 
-    @NotBlank(message="accountId cannot be blank")
-    @ConfigurationInfo(path="custom.accountId")
-    private String accountId;
-
     @ConfigurationInfo(path="service.duplicateErrorReturnsId")
     private Boolean duplicateErrorReturnsId = false;
-
-    @Min(1)
-    @Max(100)
-    @ConfigurationInfo(path="rest.ioErrorRetries")
-    private Integer ioErrorRetries = 5;
 
     @NotBlank(message="schemaRawJson cannot be blank")
     @ConfigurationInfo(path="custom.schemaRawJson")
     private String schemaRawJson;
-
-    @ConfigurationInfo(path="results.deepImport")
-    private Boolean deepImport;
 
     @ConfigurationInfo(path="security.authenticator.oauth2ClientCredentials.scope")
     private String scope;
@@ -100,17 +84,61 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationInfo(path="custom.resourceTypeUrl")
     private String resourceTypeUrl;
 
-    @NotNull(message="enterpriseUser cannot be null")
-    @ConfigurationInfo(path="custom.enterpriseUser")
-    private Boolean enterpriseUser = false;
+    @NotNull(message="clientSecret cannot be null")
+    @ConfigurationInfo(path="security.authenticator.oauth2ClientCredentials.clientSecret")
+    private GuardedString clientSecret;
+
+    @NotBlank(message="clientId cannot be blank")
+    @ConfigurationInfo(path="security.authenticator.oauth2ClientCredentials.clientId")
+    private String clientId;
+
+    @NotNull(message="enableDynamicSchema cannot be null")
+    @ConfigurationInfo(path="custom.enableDynamicSchema")
+    private Boolean enableDynamicSchema = false;
+
+    @NotBlank(message="usersEndpointUrl cannot be blank")
+    @ConfigurationInfo(path="custom.usersEndpointUrl")
+    private String usersEndpointUrl;
+
+    @NotBlank(message="resourceTypeRawJson cannot be blank")
+    @ConfigurationInfo(path="custom.resourceTypeRawJson")
+    private String resourceTypeRawJson;
+
+    @NotBlank(message="schemaUrl cannot be blank")
+    @ConfigurationInfo(path="custom.schemaUrl")
+    private String schemaUrl;
+
+    @NotNull(message="enableAWSSchema cannot be null")
+    @ConfigurationInfo(path="custom.enableAWSSchema")
+    private Boolean enableAWSSchema = false;
+
+    @NotNull(message="enableSlackSchema cannot be null")
+    @ConfigurationInfo(path="custom.enableSlackSchema")
+    private Boolean enableSlackSchema = false;
+
+    @NotBlank(message="accountId cannot be blank")
+    @ConfigurationInfo(path="custom.accountId")
+    private String accountId;
+
+    @Min(1)
+    @Max(100)
+    @ConfigurationInfo(path="rest.ioErrorRetries")
+    private Integer ioErrorRetries = 5;
+
+    @ConfigurationInfo(path="results.deepImport")
+    private Boolean deepImport;
 
     @NotNull(message="useResourceTypeUrl cannot be null")
     @ConfigurationInfo(path="custom.useResourceTypeUrl")
     private Boolean useResourceTypeUrl = false;
 
-    @NotNull(message="clientSecret cannot be null")
-    @ConfigurationInfo(path="security.authenticator.oauth2ClientCredentials.clientSecret")
-    private GuardedString clientSecret;
+    @NotBlank(message="groupEndpointUrl cannot be blank")
+    @ConfigurationInfo(path="custom.groupEndpointUrl")
+    private String groupEndpointUrl;
+
+    @NotNull(message="enableEnterpriseUser cannot be null")
+    @ConfigurationInfo(path="custom.enableEnterpriseUser")
+    private Boolean enableEnterpriseUser = false;
 
     @NotNull(message="useSchemaUrl cannot be null")
     @ConfigurationInfo(path="custom.useSchemaUrl")
@@ -144,6 +172,20 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     }
 
     @ConfigurationProperty(
+    displayMessageKey = "User SchemaId List",
+    helpMessageKey = "A list of user schemas that define a user. This is discoverable from the Resource Type URL, JSON, or by one of the prebuilt java classes",
+    order = 830,
+    confidential = false,
+    required = true)
+    public String getUserSchemaIdList() {
+        return this.userSchemaIdList;
+    }
+
+    public void setUserSchemaIdList(String input) {
+        this.userSchemaIdList = input;
+    }
+
+    @ConfigurationProperty(
     displayMessageKey = "Pagination Enabled",
     helpMessageKey = "Set to true if this connector (and its underlying API) supports pagination.",
     order = 1104,
@@ -169,34 +211,6 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
 
     public void setTokenUrl(String input) {
         this.tokenUrl = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "OAuth2 Client Id",
-    helpMessageKey = "OAuth2 Client Id",
-    order = 2902,
-    confidential = true,
-    required = true)
-    public String getClientId() {
-        return this.clientId;
-    }
-
-    public void setClientId(String input) {
-        this.clientId = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Standard User",
-    helpMessageKey = "Choose True ",
-    order = 760,
-    confidential = false,
-    required = true)
-    public Boolean getStandardUser() {
-        return this.standardUser;
-    }
-
-    public void setStandardUser(Boolean input) {
-        this.standardUser = input;
     }
 
     @ConfigurationProperty(
@@ -228,31 +242,31 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     }
 
     @ConfigurationProperty(
-    displayMessageKey = "Resource Type Raw JSON",
-    helpMessageKey = "Resource Type Raw JSON",
-    order = 740,
+    displayMessageKey = "Group SchemaId List",
+    helpMessageKey = "A list of Group schemas that define a Group. This is discoverable from the Resource Type URL or JSON. or by one of the prebuilt java classes ",
+    order = 840,
     confidential = false,
     required = true)
-    public String getResourceTypeRawJson() {
-        return this.resourceTypeRawJson;
+    public String getGroupSchemaIDList() {
+        return this.groupSchemaIDList;
     }
 
-    public void setResourceTypeRawJson(String input) {
-        this.resourceTypeRawJson = input;
+    public void setGroupSchemaIDList(String input) {
+        this.groupSchemaIDList = input;
     }
 
     @ConfigurationProperty(
-    displayMessageKey = "Schema URL",
-    helpMessageKey = "Schema URL to Connect",
-    order = 701,
+    displayMessageKey = "Enable Standard Schema",
+    helpMessageKey = "Uses prebuilt java objects based on the stand schema. ",
+    order = 760,
     confidential = false,
     required = true)
-    public String getSchemaUrl() {
-        return this.schemaUrl;
+    public Boolean getEnableStandardSchema() {
+        return this.enableStandardSchema;
     }
 
-    public void setSchemaUrl(String input) {
-        this.schemaUrl = input;
+    public void setEnableStandardSchema(Boolean input) {
+        this.enableStandardSchema = input;
     }
 
     public Map<String,String> getOauth2Information() {
@@ -261,20 +275,6 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
 
     public void setOauth2Information(Map<String,String> input) {
         this.oauth2Information = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Zoom Account Id",
-    helpMessageKey = "Zoom Account Id required for authentication.",
-    order = 701,
-    confidential = false,
-    required = true)
-    public String getAccountId() {
-        return this.accountId;
-    }
-
-    public void setAccountId(String input) {
-        this.accountId = input;
     }
 
     @ConfigurationProperty(
@@ -292,22 +292,8 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     }
 
     @ConfigurationProperty(
-    displayMessageKey = "IO Error Retries",
-    helpMessageKey = "If IO Error occurs during API invocation, this number of retries will be attempted before giving up",
-    order = 1001,
-    confidential = false,
-    required = false)
-    public Integer getIoErrorRetries() {
-        return this.ioErrorRetries;
-    }
-
-    public void setIoErrorRetries(Integer input) {
-        this.ioErrorRetries = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Schema Raw JSON",
-    helpMessageKey = "Raw JSON",
+    displayMessageKey = "Schema JSON",
+    helpMessageKey = "The actual Schema return for a particular service provider. This can be populated from the URL at discovery time.",
     order = 710,
     confidential = false,
     required = true)
@@ -317,20 +303,6 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
 
     public void setSchemaRawJson(String input) {
         this.schemaRawJson = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Deep Import Enabled",
-    helpMessageKey = "If true, an individual getOne request for each item in Import getAll requests will be performed.",
-    order = 1102,
-    confidential = false,
-    required = false)
-    public Boolean getDeepImport() {
-        return this.deepImport;
-    }
-
-    public void setDeepImport(Boolean input) {
-        this.deepImport = input;
     }
 
     @ConfigurationProperty(
@@ -349,7 +321,7 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
 
     @ConfigurationProperty(
     displayMessageKey = "Resource Type URL",
-    helpMessageKey = "Resource Type URL to Connect",
+    helpMessageKey = "URL to Discover resource type for a particular service provider. These included Users and Groups URL endpoints. ",
     order = 730,
     confidential = false,
     required = true)
@@ -359,34 +331,6 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
 
     public void setResourceTypeUrl(String input) {
         this.resourceTypeUrl = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Enterprise User",
-    helpMessageKey = "Choose True to add Enterprise User Privileges to the User",
-    order = 770,
-    confidential = false,
-    required = true)
-    public Boolean getEnterpriseUser() {
-        return this.enterpriseUser;
-    }
-
-    public void setEnterpriseUser(Boolean input) {
-        this.enterpriseUser = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Use Resource Type URL",
-    helpMessageKey = "Choose True to use Resource Type URL, otherwise Midpoint uses Resource Type raw JSON",
-    order = 750,
-    confidential = false,
-    required = true)
-    public Boolean getUseResourceTypeUrl() {
-        return this.useResourceTypeUrl;
-    }
-
-    public void setUseResourceTypeUrl(Boolean input) {
-        this.useResourceTypeUrl = input;
     }
 
     @ConfigurationProperty(
@@ -404,8 +348,190 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     }
 
     @ConfigurationProperty(
+    displayMessageKey = "OAuth2 Client Id",
+    helpMessageKey = "OAuth2 Client Id",
+    order = 2902,
+    confidential = true,
+    required = true)
+    public String getClientId() {
+        return this.clientId;
+    }
+
+    public void setClientId(String input) {
+        this.clientId = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Enable Dynamic Schema",
+    helpMessageKey = "Use the Resource Type and/or the Schema defined ",
+    order = 800,
+    confidential = false,
+    required = true)
+    public Boolean getEnableDynamicSchema() {
+        return this.enableDynamicSchema;
+    }
+
+    public void setEnableDynamicSchema(Boolean input) {
+        this.enableDynamicSchema = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Users Endpoint URL",
+    helpMessageKey = "Discovered from the resource type or entered manually",
+    order = 810,
+    confidential = false,
+    required = true)
+    public String getUsersEndpointUrl() {
+        return this.usersEndpointUrl;
+    }
+
+    public void setUsersEndpointUrl(String input) {
+        this.usersEndpointUrl = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Resource Type JSON",
+    helpMessageKey = "The actual resource types for a particular service provider",
+    order = 740,
+    confidential = false,
+    required = true)
+    public String getResourceTypeRawJson() {
+        return this.resourceTypeRawJson;
+    }
+
+    public void setResourceTypeRawJson(String input) {
+        this.resourceTypeRawJson = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Schema URL",
+    helpMessageKey = "URL to discover schema for a particular service provider",
+    order = 701,
+    confidential = false,
+    required = true)
+    public String getSchemaUrl() {
+        return this.schemaUrl;
+    }
+
+    public void setSchemaUrl(String input) {
+        this.schemaUrl = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Enable AWS Schema",
+    helpMessageKey = "Use a pre-built java objects as defined for AWS As specified here https://docs.aws.amazon.com/singlesignon/latest/developerguide/what-is-scim.html",
+    order = 780,
+    confidential = false,
+    required = true)
+    public Boolean getEnableAWSSchema() {
+        return this.enableAWSSchema;
+    }
+
+    public void setEnableAWSSchema(Boolean input) {
+        this.enableAWSSchema = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Enable Slack Schema",
+    helpMessageKey = "Use prebuilt java classes as define for Slack as specified here: https://api.slack.com/admins/scim2",
+    order = 790,
+    confidential = false,
+    required = true)
+    public Boolean getEnableSlackSchema() {
+        return this.enableSlackSchema;
+    }
+
+    public void setEnableSlackSchema(Boolean input) {
+        this.enableSlackSchema = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Zoom Account Id",
+    helpMessageKey = "Zoom Account Id required for authentication.",
+    order = 701,
+    confidential = false,
+    required = true)
+    public String getAccountId() {
+        return this.accountId;
+    }
+
+    public void setAccountId(String input) {
+        this.accountId = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "IO Error Retries",
+    helpMessageKey = "If IO Error occurs during API invocation, this number of retries will be attempted before giving up",
+    order = 1001,
+    confidential = false,
+    required = false)
+    public Integer getIoErrorRetries() {
+        return this.ioErrorRetries;
+    }
+
+    public void setIoErrorRetries(Integer input) {
+        this.ioErrorRetries = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Deep Import Enabled",
+    helpMessageKey = "If true, an individual getOne request for each item in Import getAll requests will be performed.",
+    order = 1102,
+    confidential = false,
+    required = false)
+    public Boolean getDeepImport() {
+        return this.deepImport;
+    }
+
+    public void setDeepImport(Boolean input) {
+        this.deepImport = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Use Resource Type URL",
+    helpMessageKey = "Whether to use the URL or the JSON. Especially when the URL is not supported by the service provider.",
+    order = 750,
+    confidential = false,
+    required = true)
+    public Boolean getUseResourceTypeUrl() {
+        return this.useResourceTypeUrl;
+    }
+
+    public void setUseResourceTypeUrl(Boolean input) {
+        this.useResourceTypeUrl = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Group Endpoint URL",
+    helpMessageKey = "Discovered from the resource type or entered manually",
+    order = 820,
+    confidential = false,
+    required = true)
+    public String getGroupEndpointUrl() {
+        return this.groupEndpointUrl;
+    }
+
+    public void setGroupEndpointUrl(String input) {
+        this.groupEndpointUrl = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Enable Enterprise User",
+    helpMessageKey = "Extend the user schema with enterprise attributes ",
+    order = 770,
+    confidential = false,
+    required = true)
+    public Boolean getEnableEnterpriseUser() {
+        return this.enableEnterpriseUser;
+    }
+
+    public void setEnableEnterpriseUser(Boolean input) {
+        this.enableEnterpriseUser = input;
+    }
+
+    @ConfigurationProperty(
     displayMessageKey = "Use Schema URL",
-    helpMessageKey = "Choose True to use Schema URL, otherwise Midpoint uses Schema raw JSON",
+    helpMessageKey = "Where to use URL or JSON especially when URL is not available",
     order = 720,
     confidential = false,
     required = true)

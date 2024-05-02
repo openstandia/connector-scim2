@@ -5,7 +5,6 @@ import com.exclamationlabs.connid.base.connector.authenticator.Authenticator;
 import com.exclamationlabs.connid.base.connector.authenticator.OAuth2TokenClientCredentialsAuthenticator;
 import com.exclamationlabs.connid.base.scim2.adapter.Scim2GroupsAdapter;
 import com.exclamationlabs.connid.base.scim2.adapter.Scim2StandardUserAdapter;
-import com.exclamationlabs.connid.base.scim2.adapter.Scim2UsersAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2Driver;
 import java.util.Collections;

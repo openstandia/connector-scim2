@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class Scim2CustomGroup {
-    private String name; //complex
-    private String value;
-    private String $ref;
-    private String display;
-    private String type; //should enum
+  private String name; // complex
+  private String value;
+  private String $ref;
+  private String display;
+  private String type; // should enum
 }

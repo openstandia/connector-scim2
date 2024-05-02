@@ -61,11 +61,11 @@ public class Scim2ConnectorApiIntegrationTest
     attributes.add(new AttributeBuilder().setName(TYPE.name()).addValue(UserType.BASIC).build());
     attributes.add(new AttributeBuilder().setName(EMAIL.name()).addValue(userEmail).build());*/
     Uid newId =
-            getConnectorFacade()
-                    .create(ObjectClass.ACCOUNT, attributes, new OperationOptionsBuilder().build());
+        getConnectorFacade()
+            .create(ObjectClass.ACCOUNT, attributes, new OperationOptionsBuilder().build());
     assertNotNull(newId);
     assertNotNull(newId.getUidValue());
-    //generatedUserId = newId.getUidValue();
+    // generatedUserId = newId.getUidValue();
   }
 
   @Test
