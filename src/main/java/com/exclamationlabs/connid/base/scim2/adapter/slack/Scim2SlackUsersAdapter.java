@@ -1,0 +1,248 @@
+package com.exclamationlabs.connid.base.scim2.adapter.slack;
+
+import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
+import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
+import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
+import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType;
+import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
+import com.exclamationlabs.connid.base.scim2.model.Scim2Name;
+import com.exclamationlabs.connid.base.scim2.model.Scim2Schema;
+import com.exclamationlabs.connid.base.scim2.model.Scim2User;
+import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
+import com.exclamationlabs.connid.base.scim2.model.SubAttribute;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.*;
+import org.identityconnectors.framework.common.objects.Attribute;
+import org.identityconnectors.framework.common.objects.AttributeInfo;
+import org.identityconnectors.framework.common.objects.ObjectClass;
+
+import java.io.IOException;
+import java.util.*;
+
+public class Scim2SlackUsersAdapter extends BaseAdapter<Scim2SlackUser, Scim2Configuration> {
+  @Override
+  public ObjectClass getType() {
+    return ObjectClass.ACCOUNT;
+  }
+
+  @Override
+  public Class<Scim2SlackUser> getIdentityModelClass() {
+    return Scim2SlackUser.class;
+  }
+
+  @Override
+  public Set<ConnectorAttribute> getConnectorAttributes() {
+    // if configuration standard user/enterprise user, case stmt, Build ConnectorAttribute
+    // accordingly
+    // Remember Enterprise user is a super set of User
+    // If user Dynamic, Build ConnectorAttribute accordingly
+    String rawJson = getConfiguration().getSchemaRawJson();
+    Scim2SlackStandardUserAdapter scim2StandardUserAdapter = new Scim2SlackStandardUserAdapter();
+
+    Gson gson = new Gson();
+    JsonElement jsonElement = JsonParser.parseString(rawJson);
+
+    if (jsonElement.isJsonArray()) {
+      JsonArray jsonArray = jsonElement.getAsJsonArray();
+      for (JsonElement element : jsonArray) {
+        Map<String, Object> schemaMap = parseJsonElement(element);
+        printSchema(schemaMap, 0);
+      }
+    }
+
+    System.out.println("RAW JSON ---> " + rawJson);
+    ObjectMapper objectMapper = new ObjectMapper();
+    List<Scim2Schema> schemaPojo = null;
+
+    try {
+      schemaPojo = objectMapper.readValue(rawJson, new TypeReference<List<Scim2Schema>>() {});
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    Set<ConnectorAttribute> result = new HashSet<>();
+    schemaPojo.forEach(
+        obj -> {
+          if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:User")) {
+            scim2StandardUserAdapter.setStandardUserSchema(obj);
+
+            List<com.exclamationlabs.connid.base.scim2.model.Attribute> userAttributes =
+                obj.getAttributes();
+
+            for (com.exclamationlabs.connid.base.scim2.model.Attribute userAttribute :
+                userAttributes) {
+
+              if (userAttribute.getType().equalsIgnoreCase("complex")) {
+
+                if (!userAttribute.getType().equalsIgnoreCase("reference"))
+                  for (SubAttribute subAttribute : userAttribute.getSubAttributes()) {
+                    if (!(subAttribute.getType().equalsIgnoreCase("reference")
+                        || subAttribute.getType().equalsIgnoreCase("binary")))
+                      result.add(
+                          new ConnectorAttribute(
+                              subAttribute.getName(),
+                              ConnectorAttributeDataType.valueOf(
+                                  subAttribute.getType().toUpperCase()),
+                              buildFlags(subAttribute)));
+                  }
+
+              } else {
+                if (!userAttribute.getType().equalsIgnoreCase("reference")) {
+                  result.add(
+                      new ConnectorAttribute(
+                          userAttribute.getName(),
+                          ConnectorAttributeDataType.valueOf(userAttribute.getType().toUpperCase()),
+                          buildFlags(userAttribute)));
+                }
+                if (userAttribute.getSubAttributes() != null) {
+                  for (SubAttribute subAttribute : userAttribute.getSubAttributes()) {
+                    if (!(subAttribute.getType().equalsIgnoreCase("reference")
+                        || subAttribute.getType().equalsIgnoreCase("binary")))
+                      result.add(
+                          new ConnectorAttribute(
+                              subAttribute.getName(),
+                              ConnectorAttributeDataType.valueOf(
+                                  subAttribute.getType().toUpperCase()),
+                              buildFlags(subAttribute)));
+                  }
+                }
+              }
+            }
+          }
+        });
+    return result;
+  }
+
+  /*@Override
+  protected Set<Attribute> constructAttributes(Scim2SlackUser scimSlack2User) {
+    return null;
+  }*/
+
+  private void processAttributeFlags(
+      Set<AttributeInfo.Flags> flagsSet,
+      boolean multiValued,
+      boolean required,
+      boolean caseExact,
+      String mutability,
+      String returned,
+      String uniqueness) {
+    if (multiValued) {
+      flagsSet.add(AttributeInfo.Flags.MULTIVALUED);
+    }
+    if (required) {
+      flagsSet.add(AttributeInfo.Flags.REQUIRED);
+    }
+    // if (caseExact) {
+    //     list.add(AttributeInfo.Subtypes.MULTIVALUED);
+    // }
+    if ("readOnly".equalsIgnoreCase(mutability)) {
+      flagsSet.add(AttributeInfo.Flags.NOT_UPDATEABLE);
+    }
+    if ("writeOnly".equalsIgnoreCase(mutability)) {
+      flagsSet.add(AttributeInfo.Flags.NOT_READABLE);
+    }
+    if ("never".equalsIgnoreCase(returned)) {
+      flagsSet.add(AttributeInfo.Flags.NOT_RETURNED_BY_DEFAULT);
+    }
+    if ("server".equalsIgnoreCase(uniqueness)) {
+      flagsSet.add(AttributeInfo.Flags.NOT_CREATABLE);
+    }
+  }
+
+  Set<AttributeInfo.Flags> buildFlags(
+      com.exclamationlabs.connid.base.scim2.model.Attribute attribute) {
+    return getFlags(
+        attribute.getMultiValued(),
+        attribute.getRequired(),
+        attribute.getCaseExact(),
+        attribute.getMutability(),
+        attribute.getReturned(),
+        attribute.getUniqueness());
+  }
+
+  private Set<AttributeInfo.Flags> getFlags(
+      Boolean multiValued,
+      Boolean required,
+      Boolean caseExact,
+      String mutability,
+      String returned,
+      String uniqueness) {
+    Set<AttributeInfo.Flags> flagsSet = new HashSet<>();
+    processAttributeFlags(
+        flagsSet,
+        multiValued != null ? multiValued : false,
+        required != null ? required : false,
+        caseExact != null ? caseExact : false,
+        mutability != null ? mutability : "",
+        returned != null ? returned : "",
+        uniqueness != null ? uniqueness : "");
+    return flagsSet;
+  }
+
+  Set<AttributeInfo.Flags> buildFlags(
+      SubAttribute attribute) {
+    return getFlags(
+        attribute.getMultiValued(),
+        attribute.getRequired(),
+        attribute.getCaseExact(),
+        attribute.getMutability(),
+        attribute.getReturned(),
+        attribute.getUniqueness());
+  }
+
+  public static Map<String, Object> parseJsonElement(JsonElement jsonElement) {
+    Map<String, Object> map = new HashMap<>();
+    Gson gson = new Gson();
+
+    if (jsonElement.isJsonObject()) {
+      JsonObject jsonObject = jsonElement.getAsJsonObject();
+      for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+        JsonElement value = entry.getValue();
+        if (value.isJsonObject()) {
+          map.put(entry.getKey(), parseJsonElement(value));
+        } else {
+          map.put(entry.getKey(), gson.fromJson(value, Object.class));
+        }
+      }
+    }
+
+    return map;
+  }
+
+  public static void printSchema(Map<String, Object> schemaMap, int depth) {
+    for (Map.Entry<String, Object> entry : schemaMap.entrySet()) {
+      String indentation = "  ".repeat(depth);
+      System.out.println(indentation + "Property: " + entry.getKey());
+      Object value = entry.getValue();
+      if (value instanceof Map) {
+        printSchema((Map<String, Object>) value, depth + 1);
+      } else {
+        System.out.println(indentation + "  " + "Type: " + value);
+      }
+    }
+  }
+
+  @Override
+  protected Set<Attribute> constructAttributes(Scim2SlackUser model) {
+    return null;
+  }
+
+  @Override
+  protected Scim2SlackUser constructModel(
+      Set<Attribute> attributes,
+      Set<Attribute> addedMultiValueAttributes,
+      Set<Attribute> removedMultiValueAttributes,
+      boolean isCreate) {
+    Scim2SlackUser user = new Scim2SlackUser();
+
+    user.setId(AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes));
+    // user.setUserName(AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes,
+    // "userName"));
+    Scim2Name userName = new Scim2Name();
+    // userName.setName();
+
+    user.setScim2Name(userName);
+    return user;
+  }
+}
