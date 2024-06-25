@@ -3,7 +3,7 @@ package com.exclamationlabs.connid.base.scim2.adapter;
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
-import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType;
+import com.exclamationlabs.connid.base.scim2.adapter.standard.Scim2StandardUserAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -16,7 +16,7 @@ import java.util.Map;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.Attribute;
 
-public class Scim2UsersAdapter extends BaseAdapter<Scim2User, Scim2Configuration> {
+public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration> {
   @Override
   public ObjectClass getType() {
     return ObjectClass.ACCOUNT;
@@ -33,6 +33,13 @@ public class Scim2UsersAdapter extends BaseAdapter<Scim2User, Scim2Configuration
     // accordingly
     // Remember Enterprise user is a super set of User
     // If user Dynamic, Build ConnectorAttribute accordingly
+    //follow is the order of preference  if user selects more than one true in the mid point UI
+    Boolean isSlack = getConfiguration().getEnableSlackSchema();
+    Boolean isAWS = getConfiguration().getEnableAWSSchema();
+    Boolean isStandard = getConfiguration().getEnableStandardSchema();
+    Boolean isDynamic = getConfiguration().getEnableDynamicSchema();
+
+
     String rawJson = getConfiguration().getSchemaRawJson();
     Scim2StandardUserAdapter scim2StandardUserAdapter = new Scim2StandardUserAdapter();
 
@@ -59,14 +66,14 @@ public class Scim2UsersAdapter extends BaseAdapter<Scim2User, Scim2Configuration
 
     Set<ConnectorAttribute> result = new HashSet<>();
     schemaPojo.forEach(
-        obj -> {
+        obj -> {/*
           if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:User")) {
             scim2StandardUserAdapter.setStandardUserSchema(obj);
 
-            List<com.exclamationlabs.connid.base.scim2.model.Attribute> userAttributes =
+            List<Scim2Schema.Attribute> userAttributes =
                 obj.getAttributes();
 
-            for (com.exclamationlabs.connid.base.scim2.model.Attribute userAttribute :
+            for (Scim2Schema.Attribute userAttribute :
                 userAttributes) {
 
               if (userAttribute.getType().equalsIgnoreCase("complex")) {
@@ -105,7 +112,7 @@ public class Scim2UsersAdapter extends BaseAdapter<Scim2User, Scim2Configuration
                 }
               }
             }
-          }
+          }*/
         });
     return result;
   }

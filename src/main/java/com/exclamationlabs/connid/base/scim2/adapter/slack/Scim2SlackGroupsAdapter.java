@@ -50,12 +50,12 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
 
     Set<ConnectorAttribute> result = new HashSet<>();
     schemaPojo.forEach(
-        obj -> {
+        obj -> {/*
           if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:Group")) {
-            List<com.exclamationlabs.connid.base.scim2.model.Attribute> userAttributes =
+            List<Scim2Schema.Attribute> userAttributes =
                 obj.getAttributes();
 
-            for (com.exclamationlabs.connid.base.scim2.model.Attribute userAttribute :
+            for (Scim2Schema.Attribute userAttribute :
                 userAttributes) {
 
               if (userAttribute.getType().equalsIgnoreCase("complex")) {
@@ -92,7 +92,7 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
                 }
               }
             }
-          }
+          }*/
         });
     return result;
   }

@@ -5,21 +5,21 @@ import lombok.Data;
 
 @Data
 public class Scim2Name {
-  private String name;
-  private String formatted;
+  public String name;
+  public String formatted;
 
   @JsonProperty("familyName")
-  private String familyname;
+  public String familyname;
 
   @JsonProperty("givenName")
-  private String givenname;
+  public String givenname;
 
   @JsonProperty("middleName")
-  private String middlename;
+  public String middlename;
 
   @JsonProperty("honorificPrefix")
-  private String honorificprefix;
+  public String honorificprefix;
 
   @JsonProperty("honorificSuffix")
-  private String honorificsuffix;
+  public String honorificsuffix;
 }

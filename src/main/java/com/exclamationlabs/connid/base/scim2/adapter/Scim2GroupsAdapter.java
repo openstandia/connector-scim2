@@ -2,6 +2,7 @@ package com.exclamationlabs.connid.base.scim2.adapter;
 
 import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.GROUP_NAME;
 import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.TOTAL_MEMBERS;
+import static org.springframework.boot.convert.ApplicationConversionService.configure;
 
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
@@ -12,11 +13,14 @@ import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Schema;
 import com.exclamationlabs.connid.base.scim2.model.SubAttribute;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.fasterxml.jackson.databind.SerializationConfig;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
@@ -39,6 +43,7 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
     String rawJson = getConfiguration().getSchemaRawJson();
     System.out.println("RAW JSON ---> " + rawJson);
     ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     List<Scim2Schema> schemaPojo = null;
 
     try {
@@ -49,12 +54,12 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
 
     Set<ConnectorAttribute> result = new HashSet<>();
     schemaPojo.forEach(
-        obj -> {
+        obj -> {/*
           if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:Group")) {
-            List<com.exclamationlabs.connid.base.scim2.model.Attribute> userAttributes =
+            List<Scim2Schema.Attribute> userAttributes =
                 obj.getAttributes();
 
-            for (com.exclamationlabs.connid.base.scim2.model.Attribute userAttribute :
+            for (Scim2Schema.Attribute userAttribute :
                 userAttributes) {
 
               if (userAttribute.getType().equalsIgnoreCase("complex")) {
@@ -91,7 +96,7 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
                 }
               }
             }
-          }
+          }*/
         });
     return result;
   }

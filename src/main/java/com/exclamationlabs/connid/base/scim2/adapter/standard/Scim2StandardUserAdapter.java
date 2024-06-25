@@ -1,4 +1,4 @@
-package com.exclamationlabs.connid.base.scim2.adapter.slack;
+package com.exclamationlabs.connid.base.scim2.adapter.standard;
 
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
@@ -7,22 +7,18 @@ import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-public class Scim2SlackStandardUserAdapter extends BaseAdapter<Scim2User, Scim2Configuration> {
+public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Configuration> {
 
   @Override
   public ObjectClass getType() {
@@ -62,11 +58,11 @@ public class Scim2SlackStandardUserAdapter extends BaseAdapter<Scim2User, Scim2C
     result = new HashSet<>();
 
     schemaPojo.forEach(
-        obj -> {
+        obj -> {/*
           if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:User")) {
-            List<com.exclamationlabs.connid.base.scim2.model.Attribute> userAttributes =
+            List<Scim2Schema.Attribute> userAttributes =
                 obj.getAttributes();
-            for (com.exclamationlabs.connid.base.scim2.model.Attribute userAttribute :
+            for (Scim2Schema.Attribute userAttribute :
                 userAttributes) {
               if (userAttribute.getType().equalsIgnoreCase("complex")) {
                 buildComplexElement(userAttribute, result);
@@ -86,7 +82,7 @@ public class Scim2SlackStandardUserAdapter extends BaseAdapter<Scim2User, Scim2C
                 }
               }
             }
-          }
+          }*/
         });
     result.forEach(e -> System.out.println(e.getName()));
     return result;
@@ -94,7 +90,7 @@ public class Scim2SlackStandardUserAdapter extends BaseAdapter<Scim2User, Scim2C
 
   private void buildComplexElement(
       com.exclamationlabs.connid.base.scim2.model.Attribute attribute, Set result) {
-    for (SubAttribute subAttribute :
+    for (com.exclamationlabs.connid.base.scim2.model.SubAttribute subAttribute :
         attribute.getSubAttributes()) {
       if (subAttribute.getType().equalsIgnoreCase("binary")
           || subAttribute.getType().equalsIgnoreCase("reference")) {
@@ -110,7 +106,7 @@ public class Scim2SlackStandardUserAdapter extends BaseAdapter<Scim2User, Scim2C
   }
 
   private ConnectorAttribute createConnectorAttribute(
-      SubAttribute subAttribute, String prefix) {
+      com.exclamationlabs.connid.base.scim2.model.SubAttribute subAttribute, String prefix) {
     return new ConnectorAttribute(
         prefix + subAttribute.getName(),
         ConnectorAttributeDataType.valueOf(subAttribute.getType().toUpperCase()),
@@ -122,52 +118,9 @@ public class Scim2SlackStandardUserAdapter extends BaseAdapter<Scim2User, Scim2C
 
     Set<Attribute> attributes = new HashSet<>();
     attributes.add(AttributeBuilder.build(user.getScim2Name().getName()));
-      try {
-          callAllGetters(user,attributes);
-      } catch (InvocationTargetException e) {
-          throw new RuntimeException(e);
-      } catch (IllegalAccessException e) {
-          throw new RuntimeException(e);
-      }
-      return null;
+
+    return null;
     // GET CALL
-  }
-
-  private static void callAllGetters(Scim2User obj,Set<Attribute> attributes) throws InvocationTargetException, IllegalAccessException {
-    Method[] methods = obj.getClass().getMethods();
-    for (Method method : methods) {
-      if (isGetter(method)) {
-        Object result = method.invoke(obj);
-        System.out.println(method.getName() + " result: " + result);
-        System.out.println( " method: " + method);
-        attributes.add(AttributeBuilder.build(method.getName()));
-        // If the result is not null and is an instance of a class, recursively call getters for that class
-        if (result != null && !method.getReturnType().isPrimitive() && !method.getReturnType().equals(String.class)) {
-          if(result instanceof Scim2Name){
-            //callAllGetters(result,attributes);
-            attributes.add(AttributeBuilder.build(method.getName()));
-          }
-        }
-      }
-    }
-  }
-
-  private static void callAllGetters1(Object obj,Set<Attribute> attributes) throws InvocationTargetException, IllegalAccessException {
-    Method[] methods = obj.getClass().getMethods();
-    for (Method method : methods) {
-      if (isGetter(method)) {
-        Object result = method.invoke(obj);
-        System.out.println(method.getName() + " result: " + result);
-        System.out.println( " method: " + method);
-        attributes.add(AttributeBuilder.build(method.getName()));
-      }
-    }
-  }
-
-  // Check if the method is a getter
-  private static boolean isGetter(Method method) {
-    String name = method.getName();
-    return name.startsWith("get") && method.getParameterCount() == 0 && !void.class.equals(method.getReturnType());
   }
 
   @Override
@@ -247,7 +200,6 @@ public class Scim2SlackStandardUserAdapter extends BaseAdapter<Scim2User, Scim2C
         }
       }
     }
-    constructAttributes(user);
     return user;
   }
 
@@ -384,7 +336,7 @@ public class Scim2SlackStandardUserAdapter extends BaseAdapter<Scim2User, Scim2C
   }
 
   Set<AttributeInfo.Flags> buildFlags(
-      SubAttribute attribute) {
+      com.exclamationlabs.connid.base.scim2.model.SubAttribute attribute) {
     return getFlags(
         attribute.getMultiValued(),
         attribute.getRequired(),
