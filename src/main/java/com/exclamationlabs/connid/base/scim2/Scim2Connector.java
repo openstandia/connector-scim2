@@ -18,19 +18,6 @@ public class Scim2Connector extends BaseFullAccessConnector<Scim2Configuration> 
 
   public Scim2Connector() {
     super(Scim2Configuration.class);
-    setAuthenticator(
-        (Authenticator)
-            new OAuth2TokenClientCredentialsAuthenticator() {
-              @Override
-              public String getGrantType() {
-                return "account_credentials";
-              }
-
-              @Override
-              public Map<String, String> getAdditionalFormFields() {
-                return Collections.singletonMap("account_id", configuration.getAccountId());
-              }
-            });
     setDriver(new Scim2Driver());
     setAdapters(new Scim2SlackUserAdapter(), new Scim2GroupsAdapter());
   }

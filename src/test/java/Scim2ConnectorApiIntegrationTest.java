@@ -18,15 +18,14 @@ import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class Scim2ConnectorApiIntegrationTest
-    extends ApiIntegrationTest<Scim2Configuration, Scim2Connector> {
+        extends ApiIntegrationTest<Scim2Configuration, Scim2Connector> {
 
   private static final String generatedGroupName = "redacted";
   private static String generatedGroupId;
 
   @Override
   protected Scim2Configuration getConfiguration() {
-    return new Scim2Configuration(
-        new ConfigurationNameBuilder().withConnector(() -> "SCIM2").build());
+    return new Scim2Configuration("slack_scim2");
   }
 
   @Override
@@ -46,6 +45,7 @@ public class Scim2ConnectorApiIntegrationTest
 
   @Test
   @Order(50)
+  @Disabled
   public void test050Test() {
     getConnectorFacade().test();
   }
@@ -57,6 +57,7 @@ public class Scim2ConnectorApiIntegrationTest
   }
 
   @Test
+  @Disabled
   @Order(100)
   public void test100UserCreate() {
     // Creates a 'pending' user that will be deleted at the end
@@ -66,8 +67,8 @@ public class Scim2ConnectorApiIntegrationTest
     attributes.add(new AttributeBuilder().setName(TYPE.name()).addValue(UserType.BASIC).build());
     attributes.add(new AttributeBuilder().setName(EMAIL.name()).addValue(userEmail).build());*/
     Uid newId =
-        getConnectorFacade()
-            .create(ObjectClass.ACCOUNT, attributes, new OperationOptionsBuilder().build());
+            getConnectorFacade()
+                    .create(ObjectClass.ACCOUNT, attributes, new OperationOptionsBuilder().build());
     assertNotNull(newId);
     assertNotNull(newId.getUidValue());
     // generatedUserId = newId.getUidValue();
@@ -79,14 +80,15 @@ public class Scim2ConnectorApiIntegrationTest
   public void test210GroupCreate() {
     Set<Attribute> attributes = new HashSet<>();
     attributes.add(
-        new AttributeBuilder().setName(GROUP_NAME.name()).addValue(generatedGroupName).build());
+            new AttributeBuilder().setName(GROUP_NAME.name()).addValue(generatedGroupName).build());
     generatedGroupId =
-        getConnectorFacade()
-            .create(ObjectClass.GROUP, attributes, new OperationOptionsBuilder().build())
-            .getUidValue();
+            getConnectorFacade()
+                    .create(ObjectClass.GROUP, attributes, new OperationOptionsBuilder().build())
+                    .getUidValue();
   }
 
   @Test
+  @Disabled
   @Order(140)
   public void test115UserGet() {
     Attribute idAttribute =

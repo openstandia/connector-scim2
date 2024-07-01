@@ -55,7 +55,7 @@ dependencies {
 
     // Required for MidPoint runtime
     runtimeOnly 'org.codehaus.groovy:groovy:2.5.21'
-    runtimeOnly 'com.evolveum.polygon:connector-common:1.5.0.0'
+    runtimeOnly 'com.evolveum.polygon:connector-common:1.5.1.3'
 
     // Lombok Related
     compileOnly 'org.projectlombok:lombok:1.18.32'
@@ -76,7 +76,7 @@ dependencies {
 
     testImplementation "com.exclamationlabs.connid:connector-base-test-support:${test_connector_version}-+"
 
-    testImplementation 'net.tirasa.connid:connector-framework-internal:1.5.0.0'
+    testImplementation 'net.tirasa.connid:connector-framework-internal:1.5.1.10'
 }
 
 sourceSets {
