@@ -8,15 +8,10 @@ service: true # service-url
 results: true
 security:
   authenticator:
-    oauth2ClientCredentials: true
+    directAccessToken: true
 custom:
   items:
     required:
-      accountId:
-        type: string
-        order: 701
-        display: 'Zoom Account Id'
-        help: 'Zoom Account Id required for authentication.'
       schemaUrl:
         type: string
         order: 701
