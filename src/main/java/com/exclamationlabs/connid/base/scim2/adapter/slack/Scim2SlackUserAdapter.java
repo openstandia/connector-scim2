@@ -14,14 +14,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.HttpEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.identityconnectors.framework.common.objects.*;
 
 import java.io.IOException;
 import java.util.*;
 
 import static com.exclamationlabs.connid.base.scim2.attribute.slack.Scim2SlackUserAttribute.*;
-
-//public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Configuration> {
 public class Scim2SlackUserAdapter  extends BaseAdapter<Scim2SlackUser, Scim2Configuration> {
   @Override
   public ObjectClass getType() {
@@ -37,15 +42,15 @@ public class Scim2SlackUserAdapter  extends BaseAdapter<Scim2SlackUser, Scim2Con
   private Scim2Schema schema;
   private static final String SCIM_USER_ENDPOINT = "https://api.slack.com/scim/v2/Users";
   private static final String SCIM_USER_SCHEMA_ENDPOINT = "https://api.slack.com/scim/v2/Schemas/User";
-  public Scim2SlackUserAdapter() {
-      //    this.schema = fetchSchema();
-     // System.out.println(this.schema);
+  public Scim2SlackUserAdapter()  {
+          this.schema = fetchSchema();
+      System.out.println(this.schema);
   }
-  private Scim2Schema fetchSchema() throws IOException {
+  private Scim2Schema fetchSchema()  {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
-    /*try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
       HttpGet request = new HttpGet(SCIM_USER_SCHEMA_ENDPOINT);
       request.setHeader("Content-type", "application/json");
       try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -53,18 +58,19 @@ public class Scim2SlackUserAdapter  extends BaseAdapter<Scim2SlackUser, Scim2Con
         HttpEntity entity = response.getEntity();
         String responseContent = entity != null ? EntityUtils.toString(entity) : null;
 
-
         if (response.getStatusLine().getStatusCode() != 200) {
           throw new RuntimeException("Failed to fetch schema: " + response.getStatusLine());
         }
 
-        objectMapper.readValue(responseContent, Scim2Schema.class);
-
+        Scim2Schema ss =  objectMapper.readValue(responseContent, Scim2Schema.class);
+        return ss;
       }
-    }*/
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
 
-    String rawJson = getConfiguration().getSchemaRawJson();
-    return objectMapper.readValue(rawJson, Scim2Schema.class);
+   //   String rawJson = getConfiguration().getSchemaRawJson();
+  //  return objectMapper.readValue(rawJson, Scim2Schema.class);
   }
 
     private void addAttributeToMap(Map<String, Object> map, Attribute attribute, List<Scim2Schema.Attribute> schemaAttributes) {

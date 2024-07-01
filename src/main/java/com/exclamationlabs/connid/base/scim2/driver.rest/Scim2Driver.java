@@ -9,13 +9,13 @@ import com.exclamationlabs.connid.base.connector.model.IdentityModel;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
+import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 
 public class Scim2Driver extends BaseRestDriver<Scim2Configuration> {
 
   public Scim2Driver() {
     super();
-    System.out.println();
     addInvocator(Scim2User.class, new Scim2UsersInvocator());
     addInvocator(Scim2Group.class, new Scim2GroupsInvocator());
   }
