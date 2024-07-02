@@ -2,27 +2,21 @@ package com.exclamationlabs.connid.base.scim2.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import javax.annotation.Generated;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-//@JsonPropertyOrder({"id", "name", "description", "attributes", "meta"})
-//@JsonPropertyOrder({"Resources"})
+// @JsonPropertyOrder({"id", "name", "description", "attributes", "meta"})
+// @JsonPropertyOrder({"Resources"})
 @Generated("jsonschema2pojo")
 @Data
-//@Builder
+// @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Scim2Schema {
-
-
 
   /*@JsonProperty("schemas")
   public List<String> schemas;
@@ -61,7 +55,7 @@ public class Scim2Schema {
   @JsonProperty("meta")
   private Meta meta;
 
-  public static class Attribute{
+  public static class Attribute {
     @JsonProperty("name")
     public String name;
 
@@ -92,8 +86,7 @@ public class Scim2Schema {
     @JsonProperty("subAttributes")
     public List<Attribute> subAttributes;
 
-    //@JsonProperty("referenceTypes")
-    //public List<String> referenceTypes;
+    // @JsonProperty("referenceTypes")
+    // public List<String> referenceTypes;
   }
 }
-

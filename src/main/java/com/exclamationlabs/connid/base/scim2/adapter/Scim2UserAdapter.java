@@ -3,13 +3,12 @@ package com.exclamationlabs.connid.base.scim2.adapter;
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
-import com.exclamationlabs.connid.base.scim2.adapter.standard.Scim2StandardUserAdapter;
+import com.exclamationlabs.connid.base.scim2.adapter.aws.Scim2AwsUserAdapter;
+import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackUserAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import com.google.gson.*;
-import java.io.IOException;
 import java.util.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,87 +32,22 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     // accordingly
     // Remember Enterprise user is a super set of User
     // If user Dynamic, Build ConnectorAttribute accordingly
-    //follow is the order of preference  if user selects more than one true in the mid point UI
+    // follow is the order of preference  if user selects more than one true in the mid point UI
     Boolean isSlack = getConfiguration().getEnableSlackSchema();
     Boolean isAWS = getConfiguration().getEnableAWSSchema();
     Boolean isStandard = getConfiguration().getEnableStandardSchema();
     Boolean isDynamic = getConfiguration().getEnableDynamicSchema();
 
+    Set<ConnectorAttribute> result = null;
 
-    String rawJson = getConfiguration().getSchemaRawJson();
-    Scim2StandardUserAdapter scim2StandardUserAdapter = new Scim2StandardUserAdapter();
-
-    Gson gson = new Gson();
-    JsonElement jsonElement = JsonParser.parseString(rawJson);
-
-    if (jsonElement.isJsonArray()) {
-      JsonArray jsonArray = jsonElement.getAsJsonArray();
-      for (JsonElement element : jsonArray) {
-        Map<String, Object> schemaMap = parseJsonElement(element);
-        printSchema(schemaMap, 0);
-      }
+    if (isSlack) {
+      Scim2SlackUserAdapter scim2SlackUserAdapter = new Scim2SlackUserAdapter();
+      scim2SlackUserAdapter.setConfig(getConfiguration().getSchemaRawJson());
+      result = scim2SlackUserAdapter.getConnectorAttributes();
+    } else if (isAWS) {
+      Scim2AwsUserAdapter scim2AwsUserAdapter = new Scim2AwsUserAdapter();
+      result = scim2AwsUserAdapter.getConnectorAttributes();
     }
-
-    System.out.println("RAW JSON ---> " + rawJson);
-    ObjectMapper objectMapper = new ObjectMapper();
-    List<Scim2Schema> schemaPojo = null;
-
-    try {
-      schemaPojo = objectMapper.readValue(rawJson, new TypeReference<List<Scim2Schema>>() {});
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
-    Set<ConnectorAttribute> result = new HashSet<>();
-    schemaPojo.forEach(
-        obj -> {/*
-          if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:User")) {
-            scim2StandardUserAdapter.setStandardUserSchema(obj);
-
-            List<Scim2Schema.Attribute> userAttributes =
-                obj.getAttributes();
-
-            for (Scim2Schema.Attribute userAttribute :
-                userAttributes) {
-
-              if (userAttribute.getType().equalsIgnoreCase("complex")) {
-
-                if (!userAttribute.getType().equalsIgnoreCase("reference"))
-                  for (SubAttribute subAttribute : userAttribute.getSubAttributes()) {
-                    if (!(subAttribute.getType().equalsIgnoreCase("reference")
-                        || subAttribute.getType().equalsIgnoreCase("binary")))
-                      result.add(
-                          new ConnectorAttribute(
-                              subAttribute.getName(),
-                              ConnectorAttributeDataType.valueOf(
-                                  subAttribute.getType().toUpperCase()),
-                              buildFlags(subAttribute)));
-                  }
-
-              } else {
-                if (!userAttribute.getType().equalsIgnoreCase("reference")) {
-                  result.add(
-                      new ConnectorAttribute(
-                          userAttribute.getName(),
-                          ConnectorAttributeDataType.valueOf(userAttribute.getType().toUpperCase()),
-                          buildFlags(userAttribute)));
-                }
-                if (userAttribute.getSubAttributes() != null) {
-                  for (SubAttribute subAttribute : userAttribute.getSubAttributes()) {
-                    if (!(subAttribute.getType().equalsIgnoreCase("reference")
-                        || subAttribute.getType().equalsIgnoreCase("binary")))
-                      result.add(
-                          new ConnectorAttribute(
-                              subAttribute.getName(),
-                              ConnectorAttributeDataType.valueOf(
-                                  subAttribute.getType().toUpperCase()),
-                              buildFlags(subAttribute)));
-                  }
-                }
-              }
-            }
-          }*/
-        });
     return result;
   }
 
@@ -178,8 +112,7 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     return flagsSet;
   }
 
-  Set<AttributeInfo.Flags> buildFlags(
-      com.exclamationlabs.connid.base.scim2.model.SubAttribute attribute) {
+  Set<AttributeInfo.Flags> buildFlags(SubAttribute attribute) {
     return getFlags(
         attribute.getMultiValued(),
         attribute.getRequired(),
@@ -232,6 +165,9 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
       Set<Attribute> addedMultiValueAttributes,
       Set<Attribute> removedMultiValueAttributes,
       boolean isCreate) {
+
+
+
     Scim2User user = new Scim2User();
 
     user.setId(AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes));

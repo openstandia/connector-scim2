@@ -1,27 +1,25 @@
 package com.exclamationlabs.connid.base.scim2.adapter.slack;
 
+import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.GROUP_NAME;
+import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.TOTAL_MEMBERS;
+
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
-import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Schema;
 import com.exclamationlabs.connid.base.scim2.model.SubAttribute;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.identityconnectors.framework.common.objects.Attribute;
-import org.identityconnectors.framework.common.objects.AttributeBuilder;
-import org.identityconnectors.framework.common.objects.AttributeInfo;
-import org.identityconnectors.framework.common.objects.ObjectClass;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.GROUP_NAME;
-import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.TOTAL_MEMBERS;
+import org.identityconnectors.framework.common.objects.Attribute;
+import org.identityconnectors.framework.common.objects.AttributeBuilder;
+import org.identityconnectors.framework.common.objects.AttributeInfo;
+import org.identityconnectors.framework.common.objects.ObjectClass;
 
 public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configuration> {
 
@@ -50,7 +48,8 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
 
     Set<ConnectorAttribute> result = new HashSet<>();
     schemaPojo.forEach(
-        obj -> {/*
+        obj -> {
+          /*
           if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:Group")) {
             List<Scim2Schema.Attribute> userAttributes =
                 obj.getAttributes();
@@ -129,8 +128,7 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
     return flagsSet;
   }
 
-  Set<AttributeInfo.Flags> buildFlags(
-      SubAttribute attribute) {
+  Set<AttributeInfo.Flags> buildFlags(SubAttribute attribute) {
 
     Set<AttributeInfo.Flags> flagsSet = new HashSet<>();
     boolean multiValued = attribute.getMultiValued() != null ? attribute.getMultiValued() : false;

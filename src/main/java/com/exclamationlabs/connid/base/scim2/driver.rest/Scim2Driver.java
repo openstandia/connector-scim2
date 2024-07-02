@@ -7,6 +7,8 @@ import com.exclamationlabs.connid.base.connector.driver.rest.RestRequest;
 import com.exclamationlabs.connid.base.connector.logging.Logger;
 import com.exclamationlabs.connid.base.connector.model.IdentityModel;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
+import com.exclamationlabs.connid.base.scim2.driver.rest.slack.Scim2SlackGroupInvocator;
+import com.exclamationlabs.connid.base.scim2.driver.rest.slack.Scim2SlackUsersInvocator;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
@@ -16,8 +18,14 @@ public class Scim2Driver extends BaseRestDriver<Scim2Configuration> {
 
   public Scim2Driver() {
     super();
-    addInvocator(Scim2User.class, new Scim2UsersInvocator());
-    addInvocator(Scim2Group.class, new Scim2GroupsInvocator());
+    if(getConfiguration().getEnableSlackSchema()){
+      addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
+      addInvocator(Scim2Group.class, new Scim2SlackGroupInvocator());
+    }else{
+      addInvocator(Scim2User.class, new Scim2UsersInvocator());
+      addInvocator(Scim2Group.class, new Scim2GroupsInvocator());
+    }
+
   }
 
   @Override
