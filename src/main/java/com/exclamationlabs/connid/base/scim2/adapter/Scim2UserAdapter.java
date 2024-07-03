@@ -7,7 +7,6 @@ import com.exclamationlabs.connid.base.scim2.adapter.aws.Scim2AwsUserAdapter;
 import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackUserAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
-import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import com.google.gson.*;
 import java.util.*;
 import java.util.HashMap;
@@ -165,8 +164,6 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
       Set<Attribute> addedMultiValueAttributes,
       Set<Attribute> removedMultiValueAttributes,
       boolean isCreate) {
-
-
 
     Scim2User user = new Scim2User();
 

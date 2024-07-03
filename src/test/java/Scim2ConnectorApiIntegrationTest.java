@@ -42,7 +42,7 @@ public class Scim2ConnectorApiIntegrationTest
 
   @Test
   @Order(50)
-  @Disabled
+  // @Disabled
   public void test050Test() {
     getConnectorFacade().test();
   }

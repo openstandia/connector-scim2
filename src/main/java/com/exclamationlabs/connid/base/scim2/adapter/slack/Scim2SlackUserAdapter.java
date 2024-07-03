@@ -16,12 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
 import java.io.IOException;
 import java.util.*;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.identityconnectors.framework.common.objects.*;
 
 public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Configuration> {
@@ -47,8 +41,8 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
 
   private Scim2Schema schema;
   private static final String SCIM_USER_ENDPOINT = "https://api.slack.com/scim/v2/Users";
-  private static final String SCIM_USER_SCHEMA_ENDPOINT ="https://api.slack.com/scim/v2/Schemas/User";
-
+  private static final String SCIM_USER_SCHEMA_ENDPOINT =
+      "https://api.slack.com/scim/v2/Schemas/User";
 
   /*private Scim2Schema fetchSchema() {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -253,8 +247,6 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
         uniqueness != null ? uniqueness : "");
     return flagsSet;
   }
-
-
 
   @Override
   protected Set<Attribute> constructAttributes(Scim2SlackUser user) {
