@@ -2,16 +2,16 @@ package com.exclamationlabs.connid.base.scim2.adapter;
 
 import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.GROUP_NAME;
 import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.TOTAL_MEMBERS;
-import static org.springframework.boot.convert.ApplicationConversionService.configure;
 
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
-import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType;
+import com.exclamationlabs.connid.base.scim2.adapter.aws.Scim2AwsUserAdapter;
+import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackGroupsAdapter;
+import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackUserAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Schema;
-import com.exclamationlabs.connid.base.scim2.model.SubAttribute;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.SerializationConfig;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
@@ -38,67 +36,31 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
     return Scim2Group.class;
   }
 
+
+
   @Override
   public Set<ConnectorAttribute> getConnectorAttributes() {
-    String rawJson = getConfiguration().getSchemaRawJson();
-    System.out.println("RAW JSON ---> " + rawJson);
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    List<Scim2Schema> schemaPojo = null;
 
-    try {
-      schemaPojo = objectMapper.readValue(rawJson, new TypeReference<List<Scim2Schema>>() {});
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+
+    Boolean isSlack = getConfiguration().getEnableSlackSchema();
+    Boolean isAWS = getConfiguration().getEnableAWSSchema();
+    Boolean isStandard = getConfiguration().getEnableStandardSchema();
+    Boolean isDynamic = getConfiguration().getEnableDynamicSchema();
+
+    Set<ConnectorAttribute> result = null;
+
+    if (isSlack) {
+      Scim2SlackGroupsAdapter scim2SlackGroupsAdapter = new Scim2SlackGroupsAdapter();
+      scim2SlackGroupsAdapter.setConfig(getConfiguration().getSchemaRawJson());
+      result = scim2SlackGroupsAdapter.getConnectorAttributes();
+    } else if (isAWS) {
+      Scim2AwsUserAdapter scim2AwsUserAdapter = new Scim2AwsUserAdapter();
+      result = scim2AwsUserAdapter.getConnectorAttributes();
     }
-
-    Set<ConnectorAttribute> result = new HashSet<>();
-    schemaPojo.forEach(
-        obj -> {/*
-          if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:Group")) {
-            List<Scim2Schema.Attribute> userAttributes =
-                obj.getAttributes();
-
-            for (Scim2Schema.Attribute userAttribute :
-                userAttributes) {
-
-              if (userAttribute.getType().equalsIgnoreCase("complex")) {
-
-                // CustomScimComplexType customScimComplexType =
-                // objectMapper.readValue(userAttribute.getSubAttributes().toString(),CustomScimComplexType.class);
-
-                for (SubAttribute subAttribute : userAttribute.getSubAttributes()) {
-                  if (!subAttribute.getName().equalsIgnoreCase("$ref"))
-                    result.add(
-                        new ConnectorAttribute(
-                            subAttribute.getName(),
-                            ConnectorAttributeDataType.valueOf(
-                                subAttribute.getType().toUpperCase()),
-                            buildFlags(subAttribute)));
-                }
-
-              } else {
-                result.add(
-                    new ConnectorAttribute(
-                        userAttribute.getName(),
-                        ConnectorAttributeDataType.valueOf(userAttribute.getType().toUpperCase()),
-                        buildFlags(userAttribute)));
-
-                if (userAttribute.getSubAttributes() != null) {
-                  for (SubAttribute subAttribute : userAttribute.getSubAttributes()) {
-                    result.add(
-                        new ConnectorAttribute(
-                            subAttribute.getName(),
-                            ConnectorAttributeDataType.valueOf(
-                                subAttribute.getType().toUpperCase()),
-                            buildFlags(subAttribute)));
-                  }
-                }
-              }
-            }
-          }*/
-        });
     return result;
+
+
+
   }
 
   Set<AttributeInfo.Flags> buildFlags(

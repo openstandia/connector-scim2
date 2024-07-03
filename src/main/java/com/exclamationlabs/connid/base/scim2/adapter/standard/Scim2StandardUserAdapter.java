@@ -58,7 +58,8 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
     result = new HashSet<>();
 
     schemaPojo.forEach(
-        obj -> {/*
+        obj -> {
+          /*
           if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:User")) {
             List<Scim2Schema.Attribute> userAttributes =
                 obj.getAttributes();
@@ -163,7 +164,7 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
           user.setScim2Addresses((Scim2Addresses) obj);
         }
         continue; // For complex type objects -  as we are working on all elements of complex type,
-                  // so need to further going, that is the reason we have 'continue' here
+        // so need to further going, that is the reason we have 'continue' here
       }
 
       for (Field field : fields) {

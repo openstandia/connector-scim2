@@ -16,7 +16,7 @@ public enum Scim2UserAttribute {
   PASSWORD,
   EMAILS,
   SCIM2_CUSTOM_TYPE, // covers for
-                     // emails/phonenumbers/ims/photos/entitlements/roles/x509Certificates
+  // emails/phonenumbers/ims/photos/entitlements/roles/x509Certificates
   SCIM2_ADDRESS,
   SCIM2_CUSTOM_GROUP
 }
