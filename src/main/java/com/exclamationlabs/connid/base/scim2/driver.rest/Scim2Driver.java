@@ -23,8 +23,8 @@ public class Scim2Driver extends BaseRestDriver<Scim2Configuration> {
 
     addInvocator(Scim2User.class, new Scim2UsersInvocator());
     addInvocator(Scim2Group.class, new Scim2GroupsInvocator());
-    addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
-    addInvocator(Scim2SlackGroup.class, new Scim2SlackGroupInvocator());
+   // addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
+   // addInvocator(Scim2SlackGroup.class, new Scim2SlackGroupInvocator());
 
     /*if(getConfiguration().getEnableSlackSchema()){
       addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());

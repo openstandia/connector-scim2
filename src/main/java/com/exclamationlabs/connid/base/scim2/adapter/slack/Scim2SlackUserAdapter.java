@@ -220,7 +220,7 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
   }
 
   @Override
-  protected Set<Attribute> constructAttributes(Scim2SlackUser user) {
+  public Set<Attribute> constructAttributes(Scim2SlackUser user) {
     Set<Attribute> attributes = new HashSet<>();
 
     attributes.add(AttributeBuilder.build(USERNAME.name(), user.getUserName()));
@@ -235,7 +235,7 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
     attributes.add(AttributeBuilder.build(TIMEZONE.name(), user.getTimezone()));
     attributes.add(AttributeBuilder.build(ACTIVE.name(), user.isActive()));
     attributes.add(AttributeBuilder.build(PASSWORD.name(), user.getPassword()));
-    attributes.add(AttributeBuilder.build(EMAILS.name(), user.getEmails()));
+    //attributes.add(AttributeBuilder.build(EMAILS.name(), user.getEmails()));
     attributes.add(AttributeBuilder.build(SCIM2_ADDRESS.name(), user.getScim2Addresses()));
 
     return attributes;

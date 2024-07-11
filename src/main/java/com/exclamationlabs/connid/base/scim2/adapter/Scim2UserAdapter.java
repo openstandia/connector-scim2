@@ -8,6 +8,8 @@ import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackUserAdapter
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
 import java.util.*;
+
+import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.Attribute;
 
@@ -50,8 +52,14 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
 
 
   @Override
-  protected Set<Attribute> constructAttributes(Scim2User model) {
-    return null;
+  protected Set<Attribute> constructAttributes(Scim2User user) {
+    Set<Attribute> attributes = null;
+    if(getConfiguration().getEnableSlackSchema()){
+      attributes = new Scim2SlackUserAdapter().constructAttributes((Scim2SlackUser) user);
+    }else if(getConfiguration().getEnableAWSSchema()){
+      //Handle AWS etc..
+    }
+    return attributes;
   }
 
   @Override
