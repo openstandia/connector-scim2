@@ -118,7 +118,7 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
   protected Set<Attribute> constructAttributes(Scim2User user) {
 
     Set<Attribute> attributes = new HashSet<>();
-    attributes.add(AttributeBuilder.build(user.getScim2Name().getName()));
+    attributes.add(AttributeBuilder.build(user.getName().getName()));
 
     return null;
     // GET CALL
@@ -147,11 +147,11 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
         if (obj instanceof Scim2Entitlements) {
           user.setScim2Entitlements((Scim2Entitlements) obj);
         } else if (obj instanceof Scim2Emails) {
-          user.setScim2Emails((Scim2Emails) obj);
+          user.setEmails((List<Scim2Emails>) obj);
         } else if (obj instanceof Scim2Ims) {
           user.setScim2Ims((Scim2Ims) obj);
         } else if (obj instanceof Scim2Photos) {
-          user.setScim2Photos((Scim2Photos) obj);
+          user.setPhotos((List<Scim2Photos>) obj);
         } else if (obj instanceof Scim2Roles) {
           user.setScim2Roles((Scim2Roles) obj);
         } else if (obj instanceof Scim2X509Certificates) {
@@ -159,7 +159,7 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
         } else if (obj instanceof Scim2PhoneNumbers) {
           user.setScim2PhoneNumbers((Scim2PhoneNumbers) obj);
         } else if (obj instanceof Scim2Name) {
-          user.setScim2Name((Scim2Name) obj);
+          user.setName((Scim2Name) obj);
         } else if (obj instanceof Scim2Addresses) {
           user.setScim2Addresses((Scim2Addresses) obj);
         }

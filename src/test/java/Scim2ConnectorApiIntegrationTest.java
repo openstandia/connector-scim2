@@ -7,10 +7,12 @@ import com.exclamationlabs.connid.base.scim2.Scim2Connector;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
+import org.identityconnectors.test.common.ToListResultsHandler;
 import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -86,10 +88,10 @@ public class Scim2ConnectorApiIntegrationTest
   }
 
   @Test
-  @Disabled
+  //@Disabled
   @Order(140)
   public void test115UserGet() {
-    Attribute idAttribute = new AttributeBuilder().setName(Uid.NAME).addValue("1234").build();
+    Attribute idAttribute = new AttributeBuilder().setName(Uid.NAME).addValue("U015W17GFE2").build();
 
     results = new ArrayList<>();
     getConnectorFacade()
@@ -100,5 +102,15 @@ public class Scim2ConnectorApiIntegrationTest
             new OperationOptionsBuilder().build());
     assertEquals(1, results.size());
     assertTrue(StringUtils.isNotBlank(results.get(0).getUid().getValue().get(0).toString()));
+  }
+
+  @Test
+  public void test150GetAllUsers()
+  {
+    ToListResultsHandler listHandler = new ToListResultsHandler();
+    new Scim2Connector().executeQuery(new ObjectClass("String"), "", listHandler, new OperationOptionsBuilder().build());
+    List<ConnectorObject> users = listHandler.getObjects();
+    assertNotNull(users);
+    assertTrue(users.size() > 0);
   }
 }

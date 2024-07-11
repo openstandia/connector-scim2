@@ -39,39 +39,10 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
     return Scim2SlackUser.class;
   }
 
-  private Scim2Schema schema;
-  private static final String SCIM_USER_ENDPOINT = "https://api.slack.com/scim/v2/Users";
-  private static final String SCIM_USER_SCHEMA_ENDPOINT =
-      "https://api.slack.com/scim/v2/Schemas/User";
+  //private Scim2Schema schema;
 
-  /*private Scim2Schema fetchSchema() {
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-      HttpGet request = new HttpGet(SCIM_USER_SCHEMA_ENDPOINT);
-      request.setHeader("Content-type", "application/json");
-      try (CloseableHttpResponse response = httpClient.execute(request)) {
-        int statusCode = response.getStatusLine().getStatusCode();
-        HttpEntity entity = response.getEntity();
-        String responseContent = entity != null ? EntityUtils.toString(entity) : null;
 
-        if (response.getStatusLine().getStatusCode() != 200) {
-          throw new RuntimeException("Failed to fetch schema: " + response.getStatusLine());
-        }
-
-        Scim2Schema ss = objectMapper.readValue(responseContent, Scim2Schema.class);
-        return ss;
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
-    //   String rawJson = getConfiguration().getSchemaRawJson();
-    //  return objectMapper.readValue(rawJson, Scim2Schema.class);
-  }*/
-
-  private void addAttributeToMap(
+  /*private void addAttributeToMap(
       Map<String, Object> map, Attribute attribute, List<Scim2Schema.Attribute> schemaAttributes) {
     for (Scim2Schema.Attribute schemaAttr : schemaAttributes) {
       if (schemaAttr.name.equals(attribute.getName())) {
@@ -103,7 +74,7 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
         break;
       }
     }
-  }
+  }*/
 
   private void addAttributesToInfoSet(
       Set<ConnectorAttribute> attributeInfos,
@@ -264,7 +235,7 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
     attributes.add(AttributeBuilder.build(TIMEZONE.name(), user.getTimezone()));
     attributes.add(AttributeBuilder.build(ACTIVE.name(), user.isActive()));
     attributes.add(AttributeBuilder.build(PASSWORD.name(), user.getPassword()));
-    attributes.add(AttributeBuilder.build(EMAILS.name(), user.getScim2Emails()));
+    attributes.add(AttributeBuilder.build(EMAILS.name(), user.getEmails()));
     attributes.add(AttributeBuilder.build(SCIM2_ADDRESS.name(), user.getScim2Addresses()));
 
     return attributes;
