@@ -1,7 +1,10 @@
 package com.exclamationlabs.connid.base.scim2.driver.rest.slack;
 
 import com.exclamationlabs.connid.base.connector.driver.DriverInvocator;
+import com.exclamationlabs.connid.base.connector.driver.rest.RestRequest;
+import com.exclamationlabs.connid.base.connector.driver.rest.RestResponseData;
 import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2Driver;
+import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import java.util.Map;
 import org.identityconnectors.common.logging.Log;
@@ -27,6 +30,20 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
   public Scim2SlackUser getOne(
       Scim2Driver driver, String objectId, Map<String, Object> prefetchDataMap)
       throws ConnectorException {
-    return null;
+    Scim2SlackUser user = null;
+    driver.getConfiguration().setCurrentToken(driver.getConfiguration().getToken());
+    RestRequest req =
+            new RestRequest.Builder<>(Scim2SlackUser.class)
+                    .withGet()
+                    .withRequestUri("/Users/" + objectId)
+                    .build();
+    RestResponseData<Scim2SlackUser> response = driver.executeRequest(req);
+    if (response.getResponseStatusCode() == 200) {
+      System.out.println(response.getResponseObject());
+      user = response.getResponseObject();
+    //  getPhoneInfo(driver, user);
+    }
+
+    return user;
   }
 }

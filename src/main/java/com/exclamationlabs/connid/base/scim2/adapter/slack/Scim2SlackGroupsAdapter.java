@@ -10,13 +10,11 @@ import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDat
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Schema;
-import com.exclamationlabs.connid.base.scim2.model.SubAttribute;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.*;
-
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
@@ -33,6 +31,7 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
   public Class<Scim2Group> getIdentityModelClass() {
     return Scim2Group.class;
   }
+
   public String getConfig() {
     return config;
   }
@@ -61,20 +60,20 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
 
     Set<ConnectorAttribute> result = new HashSet<>();
     schemaPojo.forEach(
-            obj -> {
-              if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:Group")) {
-                List<Scim2Schema.Attribute> userAttributes = obj.getAttributes();
-                addAttributesToInfoSet(attributeInfos, userAttributes, "");
-              }
-            });
+        obj -> {
+          if (obj.getId().equalsIgnoreCase("urn:ietf:params:scim:schemas:core:2.0:Group")) {
+            List<Scim2Schema.Attribute> userAttributes = obj.getAttributes();
+            addAttributesToInfoSet(attributeInfos, userAttributes, "");
+          }
+        });
     attributeInfos.removeIf(Objects::isNull);
     return attributeInfos;
   }
 
   private void addAttributesToInfoSet(
-          Set<ConnectorAttribute> attributeInfos,
-          List<Scim2Schema.Attribute> schemaAttributes,
-          String parentPath) {
+      Set<ConnectorAttribute> attributeInfos,
+      List<Scim2Schema.Attribute> schemaAttributes,
+      String parentPath) {
     for (Scim2Schema.Attribute schemaAttr : schemaAttributes) {
       String fullPath = parentPath.isEmpty() ? schemaAttr.name : parentPath + "." + schemaAttr.name;
       // AttributeInfoBuilder builder = new AttributeInfoBuilder(fullPath);
@@ -85,35 +84,35 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
       // builder.setRequired(schemaAttr.required);
 
       if (schemaAttr.type.equalsIgnoreCase("string")
-              || schemaAttr.type.equalsIgnoreCase("complex")) {
+          || schemaAttr.type.equalsIgnoreCase("complex")) {
         // builder.setType(String.class);
         builder1 =
-                new ConnectorAttribute(
-                        fullPath, ConnectorAttributeDataType.valueOf("STRING"), buildFlags(schemaAttr));
+            new ConnectorAttribute(
+                fullPath, ConnectorAttributeDataType.valueOf("STRING"), buildFlags(schemaAttr));
       } else if (schemaAttr.type.equalsIgnoreCase("boolean")) {
         // builder.setType(Boolean.class);
         builder1 =
-                new ConnectorAttribute(
-                        fullPath, ConnectorAttributeDataType.valueOf("BOOLEAN"), buildFlags(schemaAttr));
+            new ConnectorAttribute(
+                fullPath, ConnectorAttributeDataType.valueOf("BOOLEAN"), buildFlags(schemaAttr));
       } else if (schemaAttr.type.equalsIgnoreCase("decimal")) {
         // builder.setType(Double.class);
         builder1 =
-                new ConnectorAttribute(
-                        fullPath,
-                        ConnectorAttributeDataType.valueOf("BIG_DECIMAL"),
-                        buildFlags(schemaAttr));
+            new ConnectorAttribute(
+                fullPath,
+                ConnectorAttributeDataType.valueOf("BIG_DECIMAL"),
+                buildFlags(schemaAttr));
       } else if (schemaAttr.type.equalsIgnoreCase("integer")) {
         // builder.setType(Integer.class);
         builder1 =
-                new ConnectorAttribute(
-                        fullPath, ConnectorAttributeDataType.valueOf("INTEGER"), buildFlags(schemaAttr));
+            new ConnectorAttribute(
+                fullPath, ConnectorAttributeDataType.valueOf("INTEGER"), buildFlags(schemaAttr));
       } else if (schemaAttr.type.equalsIgnoreCase("datetime")) {
         // builder.setType(Long.class); // Typically UNIX timestamp
         builder1 =
-                new ConnectorAttribute(
-                        fullPath,
-                        ConnectorAttributeDataType.valueOf("ZONED_DATE_TIME"),
-                        buildFlags(schemaAttr));
+            new ConnectorAttribute(
+                fullPath,
+                ConnectorAttributeDataType.valueOf("ZONED_DATE_TIME"),
+                buildFlags(schemaAttr));
       }
 
       if (schemaAttr.subAttributes != null && !schemaAttr.subAttributes.isEmpty()) {
@@ -124,43 +123,44 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
       attributeInfos.add(builder1);
     }
   }
+
   Set<AttributeInfo.Flags> buildFlags(Scim2Schema.Attribute attribute) {
     return getFlags(
-            attribute.multiValued,
-            attribute.required,
-            attribute.caseExact,
-            attribute.mutability,
-            attribute.returned,
-            attribute.uniqueness);
+        attribute.multiValued,
+        attribute.required,
+        attribute.caseExact,
+        attribute.mutability,
+        attribute.returned,
+        attribute.uniqueness);
   }
 
   private Set<AttributeInfo.Flags> getFlags(
-          Boolean multiValued,
-          Boolean required,
-          Boolean caseExact,
-          String mutability,
-          String returned,
-          String uniqueness) {
+      Boolean multiValued,
+      Boolean required,
+      Boolean caseExact,
+      String mutability,
+      String returned,
+      String uniqueness) {
     Set<AttributeInfo.Flags> flagsSet = new HashSet<>();
     processAttributeFlags(
-            flagsSet,
-            multiValued != null ? multiValued : false,
-            required != null ? required : false,
-            caseExact != null ? caseExact : false,
-            mutability != null ? mutability : "",
-            returned != null ? returned : "",
-            uniqueness != null ? uniqueness : "");
+        flagsSet,
+        multiValued != null ? multiValued : false,
+        required != null ? required : false,
+        caseExact != null ? caseExact : false,
+        mutability != null ? mutability : "",
+        returned != null ? returned : "",
+        uniqueness != null ? uniqueness : "");
     return flagsSet;
   }
 
   private void processAttributeFlags(
-          Set<AttributeInfo.Flags> flagsSet,
-          boolean multiValued,
-          boolean required,
-          boolean caseExact,
-          String mutability,
-          String returned,
-          String uniqueness) {
+      Set<AttributeInfo.Flags> flagsSet,
+      boolean multiValued,
+      boolean required,
+      boolean caseExact,
+      String mutability,
+      String returned,
+      String uniqueness) {
     if (multiValued) {
       flagsSet.add(AttributeInfo.Flags.MULTIVALUED);
     }
@@ -183,8 +183,6 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
       flagsSet.add(AttributeInfo.Flags.NOT_CREATABLE);
     }
   }
-
-
 
   @Override
   protected Set<Attribute> constructAttributes(Scim2Group group) {

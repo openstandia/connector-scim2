@@ -3,13 +3,15 @@ package com.exclamationlabs.connid.base.scim2.model;
 import com.exclamationlabs.connid.base.connector.model.IdentityModel;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class Scim2User implements IdentityModel {
 
   private String userName;
-  // private String name;
 
-  private Scim2Name scim2Name;
+
+  private Scim2Name name;
   private Scim2Addresses scim2Addresses;
 
   private String displayName;
@@ -25,10 +27,10 @@ public class Scim2User implements IdentityModel {
   // private List<Scim2CustomType> scim2CustomType; //covers for
   // emails/phonenumbers/ims/photos/entitlements/roles/x509Certificates
 
-  private Scim2Emails scim2Emails;
+  private List<Scim2Emails> emails;
   private Scim2PhoneNumbers scim2PhoneNumbers;
   private Scim2Ims scim2Ims;
-  private Scim2Photos scim2Photos;
+  private List<Scim2Photos> photos;
   private Scim2Entitlements scim2Entitlements;
   private Scim2Roles scim2Roles;
   private Scim2X509Certificates scim2X509Certificates;

@@ -8,16 +8,9 @@ import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
 import com.exclamationlabs.connid.base.scim2.adapter.aws.Scim2AwsUserAdapter;
 import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackGroupsAdapter;
-import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackUserAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
-import com.exclamationlabs.connid.base.scim2.model.Scim2Schema;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
@@ -36,11 +29,8 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
     return Scim2Group.class;
   }
 
-
-
   @Override
   public Set<ConnectorAttribute> getConnectorAttributes() {
-
 
     Boolean isSlack = getConfiguration().getEnableSlackSchema();
     Boolean isAWS = getConfiguration().getEnableAWSSchema();
@@ -58,9 +48,6 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
       result = scim2AwsUserAdapter.getConnectorAttributes();
     }
     return result;
-
-
-
   }
 
   Set<AttributeInfo.Flags> buildFlags(
