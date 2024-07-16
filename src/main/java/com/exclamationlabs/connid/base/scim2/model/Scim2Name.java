@@ -9,10 +9,10 @@ public class Scim2Name {
   public String formatted;
 
   @JsonProperty("familyName")
-  public String familyname;
+  public String familyName;
 
   @JsonProperty("givenName")
-  public String givenname;
+  public String givenName;
 
   @JsonProperty("middleName")
   public String middlename;

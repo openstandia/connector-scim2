@@ -62,7 +62,7 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
         if (checkRecognizedFaultCodes(faultData)) {
           // other fault condition
           throw new ConnectorException(
-              "Unknown fault received from Zoom.  Code: "
+              "Unknown fault received from Scim Backend.  Code: "
                   + faultData.getCode()
                   + "; Message: "
                   + faultData.getMessage());
@@ -73,7 +73,7 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
       }
     }
     throw new ConnectorException(
-        "Unknown fault received from Zoom. Raw response JSON: " + rawResponse);
+        "Unknown fault received from Scim Backend. Raw response JSON: " + rawResponse);
   }
 
   private Boolean checkRecognizedFaultCodes(ErrorResponse faultData) {
