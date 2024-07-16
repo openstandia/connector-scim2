@@ -9,7 +9,7 @@ import java.util.List;
 public class Scim2User implements IdentityModel {
 
   private String userName;
-
+  private List<String> schemas;
 
   private Scim2Name name;
   private Scim2Addresses scim2Addresses;

@@ -4,22 +4,31 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.exclamationlabs.connid.base.connector.configuration.ConfigurationReader;
 import com.exclamationlabs.connid.base.connector.test.ApiIntegrationTest;
 import com.exclamationlabs.connid.base.scim2.Scim2Connector;
+import com.exclamationlabs.connid.base.scim2.attribute.Scim2UserAttribute;
+import com.exclamationlabs.connid.base.scim2.attribute.slack.Scim2SlackUserAttribute;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.exclamationlabs.connid.base.scim2.model.UserType;
+import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import org.apache.commons.lang3.StringUtils;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
+import org.identityconnectors.framework.common.objects.filter.Filter;
+import org.identityconnectors.framework.common.objects.filter.FilterVisitor;
 import org.identityconnectors.test.common.ToListResultsHandler;
 import org.junit.jupiter.api.*;
+import com.exclamationlabs.connid.base.scim2.attribute.slack.Scim2SlackUserAttribute.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class Scim2ConnectorApiIntegrationTest
     extends ApiIntegrationTest<Scim2Configuration, Scim2Connector> {
 
   private static final String generatedGroupName = "redacted";
+  private static String generatedUserId;
   private static String generatedGroupId;
 
   @Override
@@ -57,21 +66,23 @@ public class Scim2ConnectorApiIntegrationTest
   }
 
   @Test
-  @Disabled
+  //@Disabled
   @Order(100)
   public void test100UserCreate() {
     // Creates a 'pending' user that will be deleted at the end
     Set<Attribute> attributes = new HashSet<>();
-    /*attributes.add(new AttributeBuilder().setName(FIRST_NAME.name()).addValue(firstName).build());
-    attributes.add(new AttributeBuilder().setName(LAST_NAME.name()).addValue(lastName).build());
-    attributes.add(new AttributeBuilder().setName(TYPE.name()).addValue(UserType.BASIC).build());
-    attributes.add(new AttributeBuilder().setName(EMAIL.name()).addValue(userEmail).build());*/
+    attributes.add(new AttributeBuilder().setName("userName").addValue("local_test").build());
+    attributes.add(new AttributeBuilder().setName("name").addValue("local.test").build());
+    attributes.add(new AttributeBuilder().setName("emails").addValue("testiam@internet2.edu").build());
+  //  attributes.add(new AttributeBuilder().setName(TYPE.name()).addValue(UserType.BASIC).build());
+ //   attributes.add(new AttributeBuilder().setName(EMAIL.name()).addValue(userEmail).build());
+
     Uid newId =
         getConnectorFacade()
             .create(ObjectClass.ACCOUNT, attributes, new OperationOptionsBuilder().build());
     assertNotNull(newId);
     assertNotNull(newId.getUidValue());
-    // generatedUserId = newId.getUidValue();
+     generatedUserId = newId.getUidValue();
   }
 
   @Test
@@ -91,7 +102,7 @@ public class Scim2ConnectorApiIntegrationTest
   //@Disabled
   @Order(140)
   public void test115UserGet() {
-    Attribute idAttribute = new AttributeBuilder().setName(Uid.NAME).addValue("U015W17GFE2").build();
+    Attribute idAttribute = new AttributeBuilder().setName(Uid.NAME).addValue("U07CDDCLLRH").build();
 
     results = new ArrayList<>();
     getConnectorFacade()
@@ -108,7 +119,18 @@ public class Scim2ConnectorApiIntegrationTest
   public void test150GetAllUsers()
   {
     ToListResultsHandler listHandler = new ToListResultsHandler();
-    new Scim2Connector().executeQuery(new ObjectClass("String"), "", listHandler, new OperationOptionsBuilder().build());
+    getConnectorFacade().search(ObjectClass.ACCOUNT, new Filter() {
+      @Override
+      public boolean accept(ConnectorObject obj) {
+        return false;
+      }
+
+      @Override
+      public <R, P> R accept(FilterVisitor<R, P> v, P p) {
+        return null;
+      }
+    }, listHandler, new OperationOptionsBuilder().build());
+    //new Scim2Connector().executeQuery(ObjectClass.ACCOUNT, "", listHandler, new OperationOptionsBuilder().build());
     List<ConnectorObject> users = listHandler.getObjects();
     assertNotNull(users);
     assertTrue(users.size() > 0);
