@@ -1,8 +1,10 @@
 package com.exclamationlabs.connid.base.scim2.driver.rest;
 
+import com.exclamationlabs.connid.base.connector.driver.Driver;
 import com.exclamationlabs.connid.base.connector.driver.DriverInvocator;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestRequest;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestResponseData;
+import com.exclamationlabs.connid.base.connector.model.IdentityModel;
 import com.exclamationlabs.connid.base.connector.results.ResultsFilter;
 import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
 import com.exclamationlabs.connid.base.scim2.driver.rest.slack.Scim2SlackGroupInvocator;
@@ -19,6 +21,8 @@ import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 
 public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2User> {
+
+
 
   @Override
   public String create(Scim2Driver driver, Scim2User user1) throws ConnectorException {
@@ -62,13 +66,14 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
   }
 
   @Override
+  //public <T extends Scim2User> Set<T> getAll(
   public Set<Scim2User> getAll(
           Scim2Driver scim2Driver, ResultsFilter filter, ResultsPaginator paginator, Integer forceNumber)
           throws ConnectorException {
     String status = null;
-    Set<Scim2SlackUser> allUsers = null;
     Set<Scim2User> inactiveUsers = null;
     Set<Scim2User> activeUsers = null;
+    Set<? extends Scim2User> allUsers;
 
     if(scim2Driver.getConfiguration().getEnableSlackSchema()){
       allUsers  =  new Scim2SlackUsersInvocator().getAll(scim2Driver,filter,paginator,forceNumber);
@@ -76,7 +81,8 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
       //AWS Invocator
     }
 
-    return Collections.singleton((Scim2SlackUser) allUsers);
+   // return new HashSet<>(allUsers);
+    return null;
 
   }
 

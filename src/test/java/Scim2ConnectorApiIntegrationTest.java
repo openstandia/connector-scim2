@@ -102,7 +102,7 @@ public class Scim2ConnectorApiIntegrationTest
   //@Disabled
   @Order(140)
   public void test115UserGet() {
-    Attribute idAttribute = new AttributeBuilder().setName(Uid.NAME).addValue("U07CDDCLLRH").build();
+    Attribute idAttribute = new AttributeBuilder().setName(Uid.NAME).addValue("U07CRPWQY5Q").build();
 
     results = new ArrayList<>();
     getConnectorFacade()

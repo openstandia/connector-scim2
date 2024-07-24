@@ -9,6 +9,7 @@ import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2Driver;
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.exclamationlabs.connid.base.scim2.model.UserCreationType;
 import com.exclamationlabs.connid.base.scim2.model.request.UserCreationRequest;
+import com.exclamationlabs.connid.base.scim2.model.response.ListSlackUsersResponse;
 import com.exclamationlabs.connid.base.scim2.model.response.ListUsersResponse;
 import com.exclamationlabs.connid.base.scim2.model.response.Scim2UserCreateResponse;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
@@ -79,69 +80,54 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
   public Set<Scim2SlackUser> getUsersByStatus(
           Scim2Driver scim2Driver, String status, ResultsPaginator paginator) {
 
-    Set<Scim2User> users = null;
     Set<Scim2SlackUser> slackUsers = new HashSet<>();
-    boolean getAll = false;
-    String additionalQueryString = "?status=" + status;
-    if (paginator != null && paginator.hasPagination()) {
-      additionalQueryString = additionalQueryString + "&page_size=" + paginator.getPageSize();
-      if (paginator.getCurrentPageNumber() == null || paginator.getCurrentPageNumber() <= 0) {
-        paginator.setCurrentPageNumber(1);
-      }
-      additionalQueryString =
-              additionalQueryString + "&page_number=" + paginator.getCurrentPageNumber();
-    } else {
-      getAll = true;
-    }
+    String additionalQueryString="";
     RestRequest request =
             new RestRequest.Builder<>(ListUsersResponse.class)
                     .withGet()
-                    .withRequestUri("/Users" + additionalQueryString)
+                    .withRequestUri("/Users")
                     .build();
     RestResponseData<ListUsersResponse> data = scim2Driver.executeRequest(request);
     ListUsersResponse response = data.getResponseObject();
 
     if (response != null) {
-      users = response.getResources();
-      paginator.setTotalResults(response.getTotalResults());
-      paginator.setNumberOfProcessedPages(response.getPageNumber());
-      paginator.setNumberOfTotalPages(response.getStartIndex());
-      paginator.setPageSize(response.getItemsPerPage());
-      if (response.getResources() != null && response.getResources().size() > 0) {
+      //slackUsers = data.getResponseObject().getResources();
+      slackUsers = response.getResources();
+      paginator.setTotalResults(response.getTotalResults().intValue());
+    //  paginator.setNumberOfProcessedPages(response.getStartIndex().intValue());
+      paginator.setNumberOfTotalPages(response.getTotalResults().intValue()/response.getItemsPerPage().intValue());
+      paginator.setPageSize(response.getItemsPerPage().intValue());
+      if (data.getResponseObject().getResources() != null && data.getResponseObject().getResources().size() > 0) {
         if (paginator.getNumberOfProcessedResults() == null) {
           paginator.setNumberOfProcessedResults(0);
         }
         paginator.setNumberOfProcessedResults(
-                paginator.getNumberOfProcessedResults() + response.getResources().size());
+                paginator.getNumberOfProcessedResults() + data.getResponseObject().getResources().size());
       }
 
-      while (getAll && response.getPageNumber() < response.getTotalResults()) {
-        Integer pageNumber = response.getPageNumber() + 1;
-        additionalQueryString =
-                "?status="
-                        + status
-                        + "&page_size="
-                        + response.getPageNumber()
-                        + "&page_number="
-                        + pageNumber;
+      while ((response.getStartIndex().intValue() - 1) + response.getItemsPerPage().intValue() < response.getTotalResults().intValue()) {
+        //Integer pageNumber = response.getPageNumber() + 1;
+        additionalQueryString ="?startIndex="
+                        + (response.getStartIndex().intValue() - 1 )+response.getItemsPerPage().intValue()
+                        + "&itemsPerPage=10";
         request =
-                new RestRequest.Builder<>(ListUsersResponse.class)
+                new RestRequest.Builder<>(ListSlackUsersResponse.class)
                         .withGet()
                         .withRequestUri("/Users" + additionalQueryString)
                         .build();
-        data = scim2Driver.executeRequest(request);
-        response = data.getResponseObject();
+        RestResponseData<ListUsersResponse> data1 = scim2Driver.executeRequest(request);
+        response = data1.getResponseObject();
         if (response != null) {
-          paginator.setTotalResults(response.getTotalResults());
-          paginator.setNumberOfProcessedPages(response.getPageNumber());
-          paginator.setNumberOfTotalPages(response.getPageNumber());
+          paginator.setTotalResults(response.getTotalResults().intValue());
+         // paginator.setNumberOfProcessedPages(response.getPageNumber());
+          paginator.setNumberOfTotalPages(response.getTotalResults().intValue());
           paginator.setPageSize(response.getItemsPerPage());
-          if (response.getResources() != null && !response.getResources().isEmpty()) {
+          if (data1.getResponseObject().getResources() != null && !data1.getResponseObject().getResources().isEmpty()) {
             paginator.setNumberOfProcessedResults(
-                    paginator.getNumberOfProcessedResults() + response.getResources().size());
-            users = response.getResources();
+                    paginator.getNumberOfProcessedResults() + data1.getResponseObject().getResources().size());
+         //   slackUsers = response.getResources();
 
-           // slackUsers.addAll((Collection<? extends Scim2SlackUser>) response.getResources());
+            slackUsers.addAll(data1.getResponseObject().getResources());
           }
         }
       }

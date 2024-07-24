@@ -1,18 +1,19 @@
 package com.exclamationlabs.connid.base.scim2.model.response;
 
-import com.exclamationlabs.connid.base.scim2.model.Meta;
+
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 import java.util.Set;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-public class ListUsersResponse {
+public class ListUsersResponse <T extends Scim2User> {
+  public ListUsersResponse(){
+
+  }
   @SerializedName("next_page_token")
   private String nextPageToken;
 
@@ -29,7 +30,20 @@ public class ListUsersResponse {
   private Integer totalResults;
 
   @JsonProperty("Resources")
-  private Set<Scim2User> Resources;
+  private Set<T> Resources;
+
+  public Set<T> getResources() {
+    return Resources;
+  }
+
+  public void setResources(Set<T> resources) {
+    this.Resources = resources;
+  }
+
+  /*public List<Scim2User> getResources() {
+    // Return the list of SCIM 2.0 users
+    return null; // Placeholder implementation
+  }*/
 
   //public Set<Scim2Resource> Resources;
 

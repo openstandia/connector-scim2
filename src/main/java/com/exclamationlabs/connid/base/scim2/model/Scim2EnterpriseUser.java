@@ -9,6 +9,11 @@ public class Scim2EnterpriseUser
     private String division;
     private String department;
     private String organization;
-    private Set<String> manager;
+    private  Manager manager;
+
+    public static class Manager {
+        String managerId;
+
+    }
 
 }
