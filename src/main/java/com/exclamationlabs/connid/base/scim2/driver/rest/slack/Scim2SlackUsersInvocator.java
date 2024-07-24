@@ -54,7 +54,17 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
       throws ConnectorException {}
 
   @Override
-  public void delete(Scim2Driver driver, String userId) throws ConnectorException {}
+  public void delete(Scim2Driver driver, String userId) throws ConnectorException {
+    RestRequest req = null;
+
+    req =
+            new RestRequest.Builder<>(Void.class)
+                    .withDelete()
+                    .withRequestUri("/Users/" + userId)
+                    .build();
+    driver.executeRequest(req);
+
+  }
 
   @Override
   public Scim2SlackUser getOne(

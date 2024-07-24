@@ -135,4 +135,11 @@ public class Scim2ConnectorApiIntegrationTest
     assertNotNull(users);
     assertTrue(users.size() > 0);
   }
+
+  @Test
+  public void test390UserDelete() {
+    getConnectorFacade()
+            .delete(
+                    ObjectClass.ACCOUNT, new Uid("U07CMUWF9CL"), new OperationOptionsBuilder().build());
+  }
 }

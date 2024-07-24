@@ -51,7 +51,21 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
       throws ConnectorException {}
 
   @Override
-  public void delete(Scim2Driver driver, String userId) throws ConnectorException {}
+  public void delete(Scim2Driver driver, String userId) throws ConnectorException {
+    RestRequest req = null;
+    Scim2User scim2User ;
+   // Scim2User user = getOne(driver, userId, null);
+
+    if(driver.getConfiguration().getEnableSlackSchema()){
+    //  scim2User =  new Scim2SlackUsersInvocator().getOne(driver,userId,null);
+      new Scim2SlackUsersInvocator().delete(driver,userId);
+
+    }else if(driver.getConfiguration().getEnableAWSSchema()) {
+      //AWS Invocator
+    }
+
+
+  }
 
   @Override
   public Scim2User getOne(Scim2Driver driver, String objectId, Map<String, Object> prefetchDataMap)
