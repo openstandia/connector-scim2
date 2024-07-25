@@ -8,16 +8,20 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Scim2SlackUser extends Scim2User implements IdentityModel {
+public class Scim2SlackUser extends Scim2User {
 
   @SerializedName("urn:ietf:params:scim:schemas:extension:slack:guest:2.0:User")
   private SlackGuestUser guestInfo;
+
   //@SerializedName("urn:ietf:params:scim:schemas:extension:slack:directory:2.0:User")
   //private SlackDirectoryUser directoryInfo;
+
   @SerializedName("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User")
   private Scim2EnterpriseUser enterpriseInfo;
-  //@SerializedName("urn:ietf:params:scim:schemas:extension:slack:profile:2.0:User")
-  //private SlackProfileUser profileInfo;
+
+  @SerializedName("urn:ietf:params:scim:schemas:extension:slack:profile:2.0:User")
+  private SlackProfileUser profileInfo;
+
  /*
   private String id;
   private String userName;
