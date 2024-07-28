@@ -7,8 +7,7 @@ import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
-import com.exclamationlabs.connid.base.scim2.model.Scim2Name;
-import com.exclamationlabs.connid.base.scim2.model.Scim2Schema;
+import com.exclamationlabs.connid.base.scim2.model.*;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -17,6 +16,7 @@ import com.google.gson.*;
 import java.io.IOException;
 import java.util.*;
 import org.identityconnectors.framework.common.objects.*;
+import org.identityconnectors.framework.common.objects.Attribute;
 
 public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Configuration> {
   @Override
@@ -38,43 +38,6 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
   public Class<Scim2SlackUser> getIdentityModelClass() {
     return Scim2SlackUser.class;
   }
-
-  //private Scim2Schema schema;
-
-
-  /*private void addAttributeToMap(
-      Map<String, Object> map, Attribute attribute, List<Scim2Schema.Attribute> schemaAttributes) {
-    for (Scim2Schema.Attribute schemaAttr : schemaAttributes) {
-      if (schemaAttr.name.equals(attribute.getName())) {
-        if (schemaAttr.multiValued) {
-          List<Object> values = new ArrayList<>();
-          for (Object value : attribute.getValue()) {
-            if (schemaAttr.subAttributes != null && !schemaAttr.subAttributes.isEmpty()) {
-              Map<String, Object> subMap = new HashMap<>();
-              for (Attribute subAttr : (List<Attribute>) value) {
-                addAttributeToMap(subMap, subAttr, schemaAttr.subAttributes);
-              }
-              values.add(subMap);
-            } else {
-              values.add(value);
-            }
-          }
-          map.put(schemaAttr.name, values);
-        } else {
-          if (schemaAttr.subAttributes != null && !schemaAttr.subAttributes.isEmpty()) {
-            Map<String, Object> subMap = new HashMap<>();
-            for (Attribute subAttr : (List<Attribute>) attribute.getValue().get(0)) {
-              addAttributeToMap(subMap, subAttr, schemaAttr.subAttributes);
-            }
-            map.put(schemaAttr.name, subMap);
-          } else {
-            map.put(schemaAttr.name, attribute.getValue().get(0));
-          }
-        }
-        break;
-      }
-    }
-  }*/
 
   private void addAttributesToInfoSet(
       Set<ConnectorAttribute> attributeInfos,
@@ -223,8 +186,28 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
   public Set<Attribute> constructAttributes(Scim2SlackUser user) {
     Set<Attribute> attributes = new HashSet<>();
 
-    attributes.add(AttributeBuilder.build(USERNAME.name(), user.getUserName()));
-    attributes.add(AttributeBuilder.build(DISPLAY_NAME.name(), user.getDisplayName()));
+    attributes.add(AttributeBuilder.build(userName.name(), user.getUserName()));
+    attributes.add(AttributeBuilder.build(nickName.name(), user.getNickName()));
+    attributes.add(AttributeBuilder.build(name.name(), user.getName()));
+    attributes.add(AttributeBuilder.build(familyName.name(), user.getName().getFamilyName()));
+    attributes.add(AttributeBuilder.build(givenName.name(), user.getName().getGivenName()));
+    attributes.add(AttributeBuilder.build(middleName.name(), user.getName().getGivenName()));
+    attributes.add(
+        AttributeBuilder.build(honorificPrefix.name(), user.getName().getHonorificprefix()));
+    attributes.add(
+        AttributeBuilder.build(honorificSuffix.name(), user.getName().getHonorificsuffix()));
+
+    attributes.add(
+        AttributeBuilder.build(
+            streetAddress.name(), user.getAddresses().get(0).getStreetAddress()));
+    attributes.add(
+        AttributeBuilder.build(locality.name(), user.getAddresses().get(0).getLocality()));
+    attributes.add(AttributeBuilder.build(region.name(), user.getAddresses().get(0).getRegion()));
+    attributes.add(AttributeBuilder.build(country.name(), user.getAddresses().get(0).getCountry()));
+    attributes.add(
+        AttributeBuilder.build(postalCode.name(), user.getAddresses().get(0).getPostalCode()));
+
+    /*attributes.add(AttributeBuilder.build(DISPLAY_NAME.name(), user.getDisplayName()));
     attributes.add(AttributeBuilder.build(NICK_NAME.name(), user.getNickName()));
     attributes.add(AttributeBuilder.build(PROFILE_URL.name(), user.getProfileUrl()));
     attributes.add(AttributeBuilder.build(TITLE.name(), user.getTitle()));
@@ -236,13 +219,13 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
     attributes.add(AttributeBuilder.build(ACTIVE.name(), user.isActive()));
     attributes.add(AttributeBuilder.build(PASSWORD.name(), user.getPassword()));
     //attributes.add(AttributeBuilder.build(EMAILS.name(), user.getEmails()));
-    attributes.add(AttributeBuilder.build(SCIM2_ADDRESS.name(), user.getScim2Addresses()));
+    attributes.add(AttributeBuilder.build(SCIM2_ADDRESS.name(), user.getAddresses()));*/
 
     return attributes;
   }
 
   @Override
-  protected Scim2SlackUser constructModel(
+  public Scim2SlackUser constructModel(
       Set<Attribute> attributes,
       Set<Attribute> addedMultiValueAttributes,
       Set<Attribute> removedMultiValueAttributes,
@@ -250,12 +233,45 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
     Scim2SlackUser user = new Scim2SlackUser();
     user.setId(AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes));
     user.setUserName(
-        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, USERNAME));
-    user.setDisplayName(
+        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, userName));
+    user.setEmails(
+        AdapterValueTypeConverter.getMultipleAttributeValue(List.class, attributes, emails));
+
+    String fn =
+        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, familyName);
+    String gn =
+        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, givenName);
+    Scim2Name name = new Scim2Name();
+    name.setFamilyName(fn);
+    name.setGivenName(gn);
+    user.setName(name);
+
+    String stAddress =
+        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, streetAddress);
+
+    String local =
+        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, locality);
+    String reg =
+        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, region);
+    String pc =
+        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, postalCode);
+    String ctry =
+        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, country);
+
+    Scim2Addresses addresses = new Scim2Addresses();
+    addresses.setCountry(ctry);
+    addresses.setStreetAddress(stAddress);
+    addresses.setRegion(reg);
+    addresses.setPostalCode(pc);
+    addresses.setLocality(local);
+    // user.setAddresses(addresses);
+    user.setAddresses(Arrays.asList(addresses));
+    user.setSchemas(Arrays.asList("urn:ietf:params:scim:schemas:core:2.0:User"));
+
+    /*  user.setDisplayName(
         AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, DISPLAY_NAME));
     Scim2Name scim2Name = new Scim2Name();
-    scim2Name.setName(
-        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, NAME));
+
     scim2Name.setFormatted(
         AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, Scim2UserName));
 
@@ -267,7 +283,7 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
         AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, DISPLAY_NAME));
 
     user.setId(AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes));
-    Scim2Name userName = new Scim2Name();
+    Scim2Name userName = new Scim2Name();*/
     return user;
   }
 }

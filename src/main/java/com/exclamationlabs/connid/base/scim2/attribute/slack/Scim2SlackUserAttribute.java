@@ -1,8 +1,24 @@
 package com.exclamationlabs.connid.base.scim2.attribute.slack;
 
 public enum Scim2SlackUserAttribute {
-  USERNAME,
-  NAME,
+  userName,
+  nickName,
+  // Name Fields
+  name,
+  familyName,
+  givenName,
+  middleName,
+  honorificPrefix,
+  honorificSuffix,
+
+  // Address Fields
+
+  streetAddress,
+  locality,
+  region,
+  postalCode,
+  country,
+
   Scim2UserName,
   DISPLAY_NAME,
   NICK_NAME,
@@ -14,7 +30,7 @@ public enum Scim2SlackUserAttribute {
   TIMEZONE,
   ACTIVE,
   PASSWORD,
-  EMAILS,
+  emails,
   SCIM2_CUSTOM_TYPE, // covers for
   // emails/phonenumbers/ims/photos/entitlements/roles/x509Certificates
   SCIM2_ADDRESS,

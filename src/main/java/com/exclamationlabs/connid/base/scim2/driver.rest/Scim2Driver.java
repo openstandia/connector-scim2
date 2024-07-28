@@ -1,30 +1,25 @@
 package com.exclamationlabs.connid.base.scim2.driver.rest;
 
-import com.exclamationlabs.connid.base.connector.authenticator.Authenticator;
 import com.exclamationlabs.connid.base.connector.driver.rest.BaseRestDriver;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestFaultProcessor;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestRequest;
 import com.exclamationlabs.connid.base.connector.logging.Logger;
 import com.exclamationlabs.connid.base.connector.model.IdentityModel;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
-import com.exclamationlabs.connid.base.scim2.driver.rest.slack.Scim2SlackGroupInvocator;
-import com.exclamationlabs.connid.base.scim2.driver.rest.slack.Scim2SlackUsersInvocator;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
-import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackGroup;
-import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 
 public class Scim2Driver extends BaseRestDriver<Scim2Configuration> {
 
   public Scim2Driver() {
     super();
-    //addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
+    // addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
 
     addInvocator(Scim2User.class, new Scim2UsersInvocator());
     addInvocator(Scim2Group.class, new Scim2GroupsInvocator());
-   // addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
-   // addInvocator(Scim2SlackGroup.class, new Scim2SlackGroupInvocator());
+    // addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
+    // addInvocator(Scim2SlackGroup.class, new Scim2SlackGroupInvocator());
 
     /*if(getConfiguration().getEnableSlackSchema()){
       addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
@@ -63,20 +58,19 @@ public class Scim2Driver extends BaseRestDriver<Scim2Configuration> {
     try {
       Logger.info(this, "Performing Scim2 Connector Test Procedure");
       String adminUser =
-      executeRequest(
-              new RestRequest.Builder<>(String.class)
-                  .withGet()
-                  .withRequestUri("/Users")
-                  .build())
-          .getResponseObject();
+          executeRequest(
+                  new RestRequest.Builder<>(String.class)
+                      .withGet()
+                      .withRequestUri("/Users")
+                      .build())
+              .getResponseObject();
       // if (adminUser == null || adminUser.getId() == null) {
       //  throw new ConnectorException("Invalid admin user response");
       // }
-      System.out.println("yada yada "+adminUser);
+      System.out.println("yada yada " + adminUser);
     } catch (Exception e) {
       throw new ConnectorException("Test for Slack connection user failed.", e);
     }
-
   }
 
   /*@Override
