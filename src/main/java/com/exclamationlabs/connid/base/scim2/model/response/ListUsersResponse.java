@@ -1,19 +1,15 @@
 package com.exclamationlabs.connid.base.scim2.model.response;
 
-
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
 import java.util.Set;
 import lombok.Data;
 
 @Data
-public class ListUsersResponse <T extends Scim2User> {
-  public ListUsersResponse(){
+public class ListUsersResponse<T extends Scim2User> {
+  public ListUsersResponse() {}
 
-  }
   @SerializedName("next_page_token")
   private String nextPageToken;
 
@@ -45,7 +41,7 @@ public class ListUsersResponse <T extends Scim2User> {
     return null; // Placeholder implementation
   }*/
 
-  //public Set<Scim2Resource> Resources;
+  // public Set<Scim2Resource> Resources;
 
   /*public static class Scim2Resource {
 
@@ -151,6 +147,5 @@ public class ListUsersResponse <T extends Scim2User> {
       private boolean primary;
     }
   }*/
-
 
 }

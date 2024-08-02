@@ -9,13 +9,13 @@ public class Scim2Addresses {
   private String formatted;
 
   @JsonProperty("streetAddress")
-  private String streetaddress;
+  private String streetAddress;
 
   private String locality;
   private String region;
 
   @JsonProperty("postalCode")
-  private String postalcode;
+  private String postalCode;
 
   private String country;
   private String type; // should enum

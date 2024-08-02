@@ -4,16 +4,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.exclamationlabs.connid.base.connector.configuration.ConfigurationReader;
 import com.exclamationlabs.connid.base.connector.test.ApiIntegrationTest;
 import com.exclamationlabs.connid.base.scim2.Scim2Connector;
-import com.exclamationlabs.connid.base.scim2.attribute.Scim2UserAttribute;
-import com.exclamationlabs.connid.base.scim2.attribute.slack.Scim2SlackUserAttribute;
+import com.exclamationlabs.connid.base.scim2.attribute.slack.Scim2SlackUserAttribute.*;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.exclamationlabs.connid.base.scim2.model.UserType;
-import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import org.apache.commons.lang3.StringUtils;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
@@ -21,7 +17,6 @@ import org.identityconnectors.framework.common.objects.filter.Filter;
 import org.identityconnectors.framework.common.objects.filter.FilterVisitor;
 import org.identityconnectors.test.common.ToListResultsHandler;
 import org.junit.jupiter.api.*;
-import com.exclamationlabs.connid.base.scim2.attribute.slack.Scim2SlackUserAttribute.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class Scim2ConnectorApiIntegrationTest
@@ -66,23 +61,46 @@ public class Scim2ConnectorApiIntegrationTest
   }
 
   @Test
-  //@Disabled
+  @Disabled
   @Order(100)
   public void test100UserCreate() {
     // Creates a 'pending' user that will be deleted at the end
     Set<Attribute> attributes = new HashSet<>();
-    attributes.add(new AttributeBuilder().setName("userName").addValue("local_test").build());
-    attributes.add(new AttributeBuilder().setName("name").addValue("local.test").build());
-    attributes.add(new AttributeBuilder().setName("emails").addValue("testiam@internet2.edu").build());
-  //  attributes.add(new AttributeBuilder().setName(TYPE.name()).addValue(UserType.BASIC).build());
- //   attributes.add(new AttributeBuilder().setName(EMAIL.name()).addValue(userEmail).build());
+    attributes.add(new AttributeBuilder().setName("userName").addValue("JohnAbrham6").build());
+    attributes.add(new AttributeBuilder().setName("name").addValue("John").build());
+    attributes.add(new AttributeBuilder().setName("familyName").addValue("Abrham").build());
+    attributes.add(new AttributeBuilder().setName("givenName").addValue("JA").build());
+    attributes.add(new AttributeBuilder().setName("middleName").addValue("Rao").build());
+    attributes.add(new AttributeBuilder().setName("honorificPrefix").addValue("Sr").build());
+    attributes.add(new AttributeBuilder().setName("honorificSuffix").addValue("Majesty").build());
+
+    attributes.add(
+        new AttributeBuilder().setName("streetAddress").addValue("249 Michele Circle").build());
+
+    attributes.add(new AttributeBuilder().setName("locality").addValue("ocean county").build());
+
+    attributes.add(new AttributeBuilder().setName("region").addValue("East coast").build());
+
+    attributes.add(new AttributeBuilder().setName("postalCode").addValue("03242").build());
+    attributes.add(new AttributeBuilder().setName("country").addValue("usa").build());
+
+    attributes.add(new AttributeBuilder().setName("emails").addValue("ja6@internet2.edu").build());
+    attributes.add(
+        new AttributeBuilder()
+            .setName("schemas")
+            .addValue("urn:ietf:params:scim:schemas:core:2.0:User")
+            .build());
+
+    //  attributes.add(new
+    // AttributeBuilder().setName(TYPE.name()).addValue(UserType.BASIC).build());
+    //   attributes.add(new AttributeBuilder().setName(EMAIL.name()).addValue(userEmail).build());
 
     Uid newId =
         getConnectorFacade()
             .create(ObjectClass.ACCOUNT, attributes, new OperationOptionsBuilder().build());
     assertNotNull(newId);
     assertNotNull(newId.getUidValue());
-     generatedUserId = newId.getUidValue();
+    generatedUserId = newId.getUidValue();
   }
 
   @Test
@@ -99,10 +117,11 @@ public class Scim2ConnectorApiIntegrationTest
   }
 
   @Test
-  //@Disabled
+  @Disabled
   @Order(140)
   public void test115UserGet() {
-    Attribute idAttribute = new AttributeBuilder().setName(Uid.NAME).addValue("U07CRPWQY5Q").build();
+    Attribute idAttribute =
+        new AttributeBuilder().setName(Uid.NAME).addValue("U07CRPWQY5Q").build();
 
     results = new ArrayList<>();
     getConnectorFacade()
@@ -116,21 +135,27 @@ public class Scim2ConnectorApiIntegrationTest
   }
 
   @Test
-  public void test150GetAllUsers()
-  {
+  //@Disabled
+  public void test150GetAllUsers() {
     ToListResultsHandler listHandler = new ToListResultsHandler();
-    getConnectorFacade().search(ObjectClass.ACCOUNT, new Filter() {
-      @Override
-      public boolean accept(ConnectorObject obj) {
-        return false;
-      }
+    getConnectorFacade()
+        .search(
+            ObjectClass.ACCOUNT,
+            new Filter() {
+              @Override
+              public boolean accept(ConnectorObject obj) {
+                return false;
+              }
 
-      @Override
-      public <R, P> R accept(FilterVisitor<R, P> v, P p) {
-        return null;
-      }
-    }, listHandler, new OperationOptionsBuilder().build());
-    //new Scim2Connector().executeQuery(ObjectClass.ACCOUNT, "", listHandler, new OperationOptionsBuilder().build());
+              @Override
+              public <R, P> R accept(FilterVisitor<R, P> v, P p) {
+                return null;
+              }
+            },
+            listHandler,
+            new OperationOptionsBuilder().build());
+    // new Scim2Connector().executeQuery(ObjectClass.ACCOUNT, "", listHandler, new
+    // OperationOptionsBuilder().build());
     List<ConnectorObject> users = listHandler.getObjects();
     assertNotNull(users);
     assertTrue(users.size() > 0);
@@ -139,7 +164,6 @@ public class Scim2ConnectorApiIntegrationTest
   @Test
   public void test390UserDelete() {
     getConnectorFacade()
-            .delete(
-                    ObjectClass.ACCOUNT, new Uid("U07CMUWF9CL"), new OperationOptionsBuilder().build());
+        .delete(ObjectClass.ACCOUNT, new Uid("U07CMUWF9CL"), new OperationOptionsBuilder().build());
   }
 }

@@ -1,20 +1,17 @@
 package com.exclamationlabs.connid.base.scim2.model.request;
 
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
-import com.google.gson.annotations.SerializedName;
 
 public class UserCreationRequest {
-  //private final String action;
+  // private final String action;
 
- // @SerializedName("user_info")
+  // @SerializedName("user_info")
   private final Scim2User user;
 
   public UserCreationRequest(Scim2User userInput) {
-   // action = actionInput;
+    // action = actionInput;
     user = userInput;
   }
-
-
 
   public Scim2User getUser() {
     return user;

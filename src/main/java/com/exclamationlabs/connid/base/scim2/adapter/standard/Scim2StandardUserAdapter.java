@@ -14,7 +14,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.identityconnectors.framework.common.objects.Attribute;
-import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 
@@ -118,7 +117,7 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
   protected Set<Attribute> constructAttributes(Scim2User user) {
 
     Set<Attribute> attributes = new HashSet<>();
-    attributes.add(AttributeBuilder.build(user.getName().getName()));
+    //  attributes.add(AttributeBuilder.build(user.getName().getName()));
 
     return null;
     // GET CALL
@@ -161,7 +160,7 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
         } else if (obj instanceof Scim2Name) {
           user.setName((Scim2Name) obj);
         } else if (obj instanceof Scim2Addresses) {
-          user.setScim2Addresses((Scim2Addresses) obj);
+          //    user.setAddresses((Scim2Addresses) obj);
         }
         continue; // For complex type objects -  as we are working on all elements of complex type,
         // so need to further going, that is the reason we have 'continue' here
