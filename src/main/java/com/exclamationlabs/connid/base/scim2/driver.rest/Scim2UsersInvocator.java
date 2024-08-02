@@ -64,7 +64,7 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
     String status = null;
     Set<Scim2User> inactiveUsers = null;
     Set<Scim2User> activeUsers = null;
-    Set<? extends Scim2User> allUsers;
+    Set<? extends Scim2User> allUsers = null;
 
     if (scim2Driver.getConfiguration().getEnableSlackSchema()) {
       allUsers = new Scim2SlackUsersInvocator().getAll(scim2Driver, filter, paginator, forceNumber);
@@ -72,8 +72,8 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
       // AWS Invocator
     }
 
-    // return new HashSet<>(allUsers);
-    return null;
+    //   return new HashSet<>(allUsers);
+    return (Set<Scim2User>) allUsers;
   }
 
   @Override

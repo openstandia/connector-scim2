@@ -96,6 +96,7 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
 
     if (response != null) {
       // slackUsers = data.getResponseObject().getResources();
+      // LOG.error("Slack Response - DSR " + response);
       slackUsers = response.getResources();
       paginator.setTotalResults(response.getTotalResults().intValue());
       //  paginator.setNumberOfProcessedPages(response.getStartIndex().intValue());
@@ -112,14 +113,15 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
                 + data.getResponseObject().getResources().size());
       }
 
-      while ((response.getStartIndex().intValue() - 1) + response.getItemsPerPage().intValue()
-          < response.getTotalResults().intValue()) {
+      while (true) {
+        assert response != null;
+        if (!(response.getStartIndex() + response.getItemsPerPage() < response.getTotalResults()))
+          break;
         // Integer pageNumber = response.getPageNumber() + 1;
+        int startIndex = response.getStartIndex() + response.getItemsPerPage();
+
         additionalQueryString =
-            "?startIndex="
-                + (response.getStartIndex().intValue() - 1)
-                + response.getItemsPerPage().intValue()
-                + "&itemsPerPage=10";
+            "?startIndex=" + startIndex + "&itemsPerPage=" + response.getItemsPerPage();
         request =
             new RestRequest.Builder<>(ListSlackUsersResponse.class)
                 .withGet()
@@ -137,14 +139,23 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
             paginator.setNumberOfProcessedResults(
                 paginator.getNumberOfProcessedResults()
                     + data1.getResponseObject().getResources().size());
-            //   slackUsers = response.getResources();
+            // slackUsers = response.getResources();
 
             slackUsers.addAll(data1.getResponseObject().getResources());
           }
         }
       }
     }
-    return slackUsers;
+
+    List<Scim2SlackUser> dataList = new ArrayList<>(slackUsers);
+
+    // Get the first 0-9 elements (total 10 elements)
+    List<Scim2SlackUser> subList = dataList.subList(10, Math.min(14, dataList.size()));
+
+    // Convert the sublist back to a Set
+    Set<Scim2SlackUser> subSet = new LinkedHashSet<>(subList);
+
+    return subSet;
   }
 
   @Override

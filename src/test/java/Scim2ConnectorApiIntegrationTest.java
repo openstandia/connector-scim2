@@ -135,7 +135,7 @@ public class Scim2ConnectorApiIntegrationTest
   }
 
   @Test
-  @Disabled
+  //@Disabled
   public void test150GetAllUsers() {
     ToListResultsHandler listHandler = new ToListResultsHandler();
     getConnectorFacade()

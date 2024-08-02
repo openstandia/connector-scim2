@@ -188,16 +188,23 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
 
     attributes.add(AttributeBuilder.build(userName.name(), user.getUserName()));
     attributes.add(AttributeBuilder.build(nickName.name(), user.getNickName()));
-    attributes.add(AttributeBuilder.build(name.name(), user.getName()));
-    attributes.add(AttributeBuilder.build(familyName.name(), user.getName().getFamilyName()));
-    attributes.add(AttributeBuilder.build(givenName.name(), user.getName().getGivenName()));
-    attributes.add(AttributeBuilder.build(middleName.name(), user.getName().getGivenName()));
-    attributes.add(
-        AttributeBuilder.build(honorificPrefix.name(), user.getName().getHonorificprefix()));
-    attributes.add(
-        AttributeBuilder.build(honorificSuffix.name(), user.getName().getHonorificsuffix()));
+    // attributes.add(AttributeBuilder.build(name.name(), "NAME"));
 
-    attributes.add(
+    // attributes.add(AttributeBuilder.build(familyName.name(), user.getName().getFamilyName()));
+   // attributes.add(AttributeBuilder.build(name_familyName.name(), user.getName().getFamilyName()));
+  //  attributes.add(AttributeBuilder.build(name_givenName.name(), user.getName().getGivenName()));
+
+    /*Scim2Name scim2Name = new Scim2Name();
+    scim2Name.setGivenName(user.getName().getGivenName());
+    scim2Name.setFamilyName(user.getName().getFamilyName());
+    attributes.add(AttributeBuilder.build(name.name(),scim2Name));*/
+
+    // attributes.add(
+    //      AttributeBuilder.build(honorificPrefix.name(), user.getName().getHonorificprefix()));
+    // attributes.add(
+    //    AttributeBuilder.build(honorificSuffix.name(), user.getName().getHonorificsuffix()));
+
+    /*attributes.add(
         AttributeBuilder.build(
             streetAddress.name(), user.getAddresses().get(0).getStreetAddress()));
     attributes.add(
@@ -205,7 +212,7 @@ public class Scim2SlackUserAdapter extends BaseAdapter<Scim2SlackUser, Scim2Conf
     attributes.add(AttributeBuilder.build(region.name(), user.getAddresses().get(0).getRegion()));
     attributes.add(AttributeBuilder.build(country.name(), user.getAddresses().get(0).getCountry()));
     attributes.add(
-        AttributeBuilder.build(postalCode.name(), user.getAddresses().get(0).getPostalCode()));
+        AttributeBuilder.build(postalCode.name(), user.getAddresses().get(0).getPostalCode()));*/
 
     /*attributes.add(AttributeBuilder.build(DISPLAY_NAME.name(), user.getDisplayName()));
     attributes.add(AttributeBuilder.build(NICK_NAME.name(), user.getNickName()));

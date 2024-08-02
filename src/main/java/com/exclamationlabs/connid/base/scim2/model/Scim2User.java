@@ -2,18 +2,18 @@ package com.exclamationlabs.connid.base.scim2.model;
 
 import com.exclamationlabs.connid.base.connector.model.IdentityModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.internal.LinkedTreeMap;
 import java.util.List;
 import lombok.Data;
 
 @Data
 public class Scim2User implements IdentityModel {
 
-  private LinkedTreeMap<?, ?> data;
+  // private LinkedTreeMap<?, ?> data;
 
   private String userName;
   private List<String> schemas;
 
+  @JsonProperty("name")
   private Scim2Name name;
 
   @JsonProperty("addresses")

@@ -5,7 +5,9 @@ import lombok.Data;
 
 @Data
 public class Scim2Name {
-  public String name;
+
+  // public String name;
+
   public String formatted;
 
   @JsonProperty("familyName")

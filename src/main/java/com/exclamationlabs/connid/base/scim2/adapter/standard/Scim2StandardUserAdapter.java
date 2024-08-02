@@ -14,7 +14,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.identityconnectors.framework.common.objects.Attribute;
-import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 
@@ -118,7 +117,7 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
   protected Set<Attribute> constructAttributes(Scim2User user) {
 
     Set<Attribute> attributes = new HashSet<>();
-    attributes.add(AttributeBuilder.build(user.getName().getName()));
+    //  attributes.add(AttributeBuilder.build(user.getName().getName()));
 
     return null;
     // GET CALL

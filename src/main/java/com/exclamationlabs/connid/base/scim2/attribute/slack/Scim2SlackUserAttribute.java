@@ -1,10 +1,15 @@
 package com.exclamationlabs.connid.base.scim2.attribute.slack;
 
+import com.exclamationlabs.connid.base.scim2.attribute.Scim2UserAttribute;
+
 public enum Scim2SlackUserAttribute {
-  userName,
-  nickName,
+  userName("userName"),
+  nickName("nickName"),
   // Name Fields
   name,
+  //name_familyName("name.familyName"),
+  //name_givenName("name.givenName"),
+
   familyName,
   givenName,
   middleName,
@@ -34,5 +39,9 @@ public enum Scim2SlackUserAttribute {
   SCIM2_CUSTOM_TYPE, // covers for
   // emails/phonenumbers/ims/photos/entitlements/roles/x509Certificates
   SCIM2_ADDRESS,
-  SCIM2_CUSTOM_GROUP
+  SCIM2_CUSTOM_GROUP;
+
+  Scim2SlackUserAttribute(String s) {}
+
+  Scim2SlackUserAttribute() {}
 }
