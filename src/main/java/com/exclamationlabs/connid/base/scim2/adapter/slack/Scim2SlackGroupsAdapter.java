@@ -20,6 +20,9 @@ import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 
+/**
+ * Dynamic Groups Adapter
+ */
 public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configuration> {
 
   @Override
@@ -187,8 +190,6 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
   @Override
   protected Set<Attribute> constructAttributes(Scim2Group group) {
     Set<Attribute> attributes = new HashSet<>();
-    attributes.add(AttributeBuilder.build(TOTAL_MEMBERS.name(), group.getTotalMembers()));
-
     return attributes;
   }
 
@@ -201,11 +202,6 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
 
     Scim2Group group = new Scim2Group();
     group.setId(AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes));
-    group.setName(
-        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, GROUP_NAME));
-    group.setTotalMembers(
-        AdapterValueTypeConverter.getSingleAttributeValue(
-            Integer.class, attributes, TOTAL_MEMBERS));
     return group;
   }
 }

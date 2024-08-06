@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+import java.util.Set;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,11 +17,10 @@ import lombok.NoArgsConstructor;
 public class Scim2Group implements IdentityModel {
 
   private String id;
+  private String displayName;
+  private String externalId;
+  private Set<Map<String, String>> members;
 
-  private String name;
-
-  @SerializedName("total_members")
-  private Integer totalMembers;
 
   @Override
   public String getIdentityIdValue() {
@@ -27,6 +29,6 @@ public class Scim2Group implements IdentityModel {
 
   @Override
   public String getIdentityNameValue() {
-    return getName();
+    return getDisplayName();
   }
 }

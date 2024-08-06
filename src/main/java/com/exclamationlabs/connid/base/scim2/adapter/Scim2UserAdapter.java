@@ -3,7 +3,6 @@ package com.exclamationlabs.connid.base.scim2.adapter;
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
-import com.exclamationlabs.connid.base.scim2.adapter.aws.Scim2AwsUserAdapter;
 import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackUserAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
@@ -23,6 +22,9 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     return Scim2User.class;
   }
 
+  private Set<ConnectorAttribute> getCoreConnectorAttributes(){return null;}
+  private Set<ConnectorAttribute> getEnterpriseConnectorAttributes(){ return null;}
+
   @Override
   public Set<ConnectorAttribute> getConnectorAttributes() {
     // if configuration standard user/enterprise user, case stmt, Build ConnectorAttribute
@@ -38,12 +40,21 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     Set<ConnectorAttribute> result = null;
 
     if (isSlack) {
+      // call Standard Attributes method
+      // call enterprise attributes method
+      // call slack guest attributes method
+      // call slack profile attributes method
+      // call slack directory attributes method
+
+    } else if (isAWS || isStandard) {
+      // call Standard Attributes method
+      // call enterprise attributes method
+    }
+    else if ( isDynamic )
+    {
       Scim2SlackUserAdapter scim2SlackUserAdapter = new Scim2SlackUserAdapter();
       scim2SlackUserAdapter.setConfig(getConfiguration().getSchemaRawJson());
       result = scim2SlackUserAdapter.getConnectorAttributes();
-    } else if (isAWS) {
-      Scim2AwsUserAdapter scim2AwsUserAdapter = new Scim2AwsUserAdapter();
-      result = scim2AwsUserAdapter.getConnectorAttributes();
     }
     return result;
   }
