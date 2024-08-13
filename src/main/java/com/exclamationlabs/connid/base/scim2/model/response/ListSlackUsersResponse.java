@@ -6,6 +6,10 @@ import lombok.Data;
 
 @Data
 public class ListSlackUsersResponse extends ListUsersResponse<Scim2SlackUser> {
+
+  public ListSlackUsersResponse()
+  {
+  }
   @Override
   public Set<Scim2SlackUser> getResources() {
     return super.getResources();

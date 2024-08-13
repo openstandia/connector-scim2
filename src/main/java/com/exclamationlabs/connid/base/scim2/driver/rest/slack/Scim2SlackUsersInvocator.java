@@ -24,29 +24,37 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
   public String create(Scim2Driver driver, Scim2SlackUser scim2SlackUser)
       throws ConnectorException {
 
-    Scim2User user = null;
     String id = null;
 
     UserCreationRequest requestData = new UserCreationRequest(scim2SlackUser);
 
     RestRequest request =
-        new RestRequest.Builder<>(Scim2UserCreateResponse.class)
+        new RestRequest.Builder<>(Scim2SlackUser.class)
             .withPost()
-            .withRequestUri("/Users")
+            .withRequestUri(driver.getConfiguration().getUsersEndpointUrl())
             .withRequestBody(scim2SlackUser)
             .build();
 
-    System.out.println("Payload ---> " + request);
-
-    RestResponseData<Scim2UserCreateResponse> data = driver.executeRequest(request);
-    Scim2UserCreateResponse response = data.getResponseObject();
-
-    return "";
+    RestResponseData<Scim2SlackUser> data = driver.executeRequest(request);
+    Scim2SlackUser user = data.getResponseObject();
+    if (user != null) {
+      id = user.getId();
+    }
+    return id;
   }
 
   @Override
   public void update(Scim2Driver driver, String userId, Scim2SlackUser userModel)
-      throws ConnectorException {}
+      throws ConnectorException {
+
+    RestRequest req = new RestRequest.Builder<>(Scim2SlackUser.class)
+            .withPut()
+            .withRequestUri(driver.getConfiguration().getUsersEndpointUrl() + "/" + userId)
+            .withRequestBody(userModel)
+            .build();
+    RestResponseData<Scim2SlackUser> response = driver.executeRequest(req);
+    Scim2SlackUser updated = response.getResponseObject();
+  }
 
   @Override
   public void delete(Scim2Driver driver, String userId) throws ConnectorException {
@@ -55,9 +63,10 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
     req =
         new RestRequest.Builder<>(Void.class)
             .withDelete()
-            .withRequestUri("/Users/" + userId)
+            .withRequestUri(driver.getConfiguration().getUsersEndpointUrl() + "/" +userId)
             .build();
-    driver.executeRequest(req);
+    RestResponseData<Void> data = driver.executeRequest(req);
+    return;
   }
 
   @Override
@@ -75,7 +84,6 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
     if (response.getResponseStatusCode() == 200) {
       System.out.println(response.getResponseObject());
       user = response.getResponseObject();
-      //  getPhoneInfo(driver, user);
     }
 
     return user;

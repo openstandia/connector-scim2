@@ -1,0 +1,33 @@
+<functionLibrary xmlns="http://midpoint.evolveum.com/xml/ns/public/common/common-3" xmlns:c="http://midpoint.evolveum.com/xml/ns/public/common/common-3" xmlns:icfs="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3" xmlns:org="http://midpoint.evolveum.com/xml/ns/public/common/org-3" xmlns:q="http://prism.evolveum.com/xml/ns/public/query-3" xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3" xmlns:t="http://prism.evolveum.com/xml/ns/public/types-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" oid="00000000-0000-0000-0000-100000000000" version="3" >
+    <name>provision</name>
+    <description>Functions common scripts by ProvisionIAM</description>
+    <iteration>0</iteration>
+    <iterationToken/>
+    <function>
+        <name>jsonParser</name>
+        <parameter xsi:type="c:ExpressionParameterType">
+            <name>response</name>
+            <type xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:string</type>
+        </parameter>
+        <parameter xsi:type="c:ExpressionParameterType">
+            <name>attribute</name>
+            <type xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:string</type>
+        </parameter>
+        <returnType xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:string</returnType>
+        <script>
+            <code>
+                import groovy.json.JsonSlurper
+
+                // How to implement in mapping
+                // map = new HashMap()
+                // map.put("attribute", "role_value")
+                // map.put("response", input)
+                // attributeValue = provision.execute("jsonParser", map)
+
+                jsonSlurper = new JsonSlurper()
+                data = jsonSlurper.parseText(response)
+                return data[attribute]
+            </code>
+        </script>
+    </function>
+</functionLibrary>

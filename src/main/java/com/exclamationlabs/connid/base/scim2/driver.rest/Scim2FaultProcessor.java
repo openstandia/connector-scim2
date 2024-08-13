@@ -37,7 +37,7 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
       String responseTypeValue = responseType.getValue();
       if (!StringUtils.contains(responseTypeValue, ContentType.APPLICATION_JSON.getMimeType())) {
         // received non-JSON error response from Zoom unable to process
-        String errorMessage = "Unable to parse Zoom response, not valid JSON: ";
+        String errorMessage = "Unable to parse response, not valid JSON: ";
         Logger.info(this, String.format("%s %s", errorMessage, rawResponse));
         throw new ConnectorException(errorMessage + rawResponse);
       }
@@ -46,7 +46,7 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
 
     } catch (IOException e) {
       throw new ConnectorException(
-          "Unable to read fault response from Zoom response. "
+          "Unable to read fault response. "
               + "Status: "
               + httpResponse.getStatusLine().getStatusCode()
               + ", "

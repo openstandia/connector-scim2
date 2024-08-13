@@ -12,6 +12,8 @@ public enum Scim2EnterpriseUserAttribute
     department,
     manager,
     manager_value,
-    manager_$ref,
-    manager_displayName
+    manager_ref,
+    manager_displayName,
+    // Slack Manager ID
+    manager_managerId
 }

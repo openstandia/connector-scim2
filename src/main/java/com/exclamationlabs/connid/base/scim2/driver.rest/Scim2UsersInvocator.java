@@ -4,6 +4,7 @@ import com.exclamationlabs.connid.base.connector.driver.DriverInvocator;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestRequest;
 import com.exclamationlabs.connid.base.connector.results.ResultsFilter;
 import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
+import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.driver.rest.slack.Scim2SlackUsersInvocator;
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
@@ -24,7 +25,20 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
 
   @Override
   public void update(Scim2Driver driver, String userId, Scim2User userModel)
-      throws ConnectorException {}
+      throws ConnectorException {
+    Scim2Configuration config = driver.getConfiguration();
+    if ( config.getEnableSlackSchema() ) {
+      new Scim2SlackUsersInvocator().update(driver, userId, (Scim2SlackUser) userModel);
+    }
+    else if (config.getEnableStandardSchema() || config.getEnableAWSSchema())
+    {
+      ;
+    }
+    else if (config.getEnableDynamicSchema())
+    {
+      ;
+    }
+  }
 
   @Override
   public void delete(Scim2Driver driver, String userId) throws ConnectorException {

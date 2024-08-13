@@ -20,6 +20,9 @@ public class Scim2Group implements IdentityModel {
   private String displayName;
   private String externalId;
   private Set<Map<String, String>> members;
+  private transient Set<Map<String, String>> addMembers;
+  private transient Set<Map<String, String>> removeMembers;
+  private transient Set<Map<String, String>> createMembers;
 
 
   @Override
