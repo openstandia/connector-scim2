@@ -1,8 +1,5 @@
 package com.exclamationlabs.connid.base.scim2.adapter.slack;
 
-import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.GROUP_NAME;
-import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.TOTAL_MEMBERS;
-
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
@@ -20,6 +17,9 @@ import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 
+/**
+ * Dynamic Groups Adapter
+ */
 public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configuration> {
 
   @Override
@@ -187,8 +187,6 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
   @Override
   protected Set<Attribute> constructAttributes(Scim2Group group) {
     Set<Attribute> attributes = new HashSet<>();
-    attributes.add(AttributeBuilder.build(TOTAL_MEMBERS.name(), group.getTotalMembers()));
-
     return attributes;
   }
 
@@ -201,11 +199,6 @@ public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Config
 
     Scim2Group group = new Scim2Group();
     group.setId(AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes));
-    group.setName(
-        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, GROUP_NAME));
-    group.setTotalMembers(
-        AdapterValueTypeConverter.getSingleAttributeValue(
-            Integer.class, attributes, TOTAL_MEMBERS));
     return group;
   }
 }

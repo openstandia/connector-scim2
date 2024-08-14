@@ -129,8 +129,7 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
       Set<Attribute> addedMultiValueAttributes,
       Set<Attribute> removedMultiValueAttributes,
       boolean isCreate) {
-    // POST /PUT
-    System.out.println("Attributes " + result);
+
     Scim2User user = new Scim2User();
     for (ConnectorAttribute attr : result) {
 
@@ -143,26 +142,8 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
                 .collect(Collectors.toSet());
         System.out.println("Attributes " + miniSet);
         Object obj = createObject("Scim2" + capitalizeFirstLetter(tokens[0]), user);
-        if (obj instanceof Scim2Entitlements) {
-          user.setScim2Entitlements((Scim2Entitlements) obj);
-        } else if (obj instanceof Scim2Emails) {
-          user.setEmails((List<Scim2Emails>) obj);
-        } else if (obj instanceof Scim2Ims) {
-          user.setScim2Ims((Scim2Ims) obj);
-        } else if (obj instanceof Scim2Photos) {
-          user.setPhotos((List<Scim2Photos>) obj);
-        } else if (obj instanceof Scim2Roles) {
-          user.setScim2Roles((Scim2Roles) obj);
-        } else if (obj instanceof Scim2X509Certificates) {
-          user.setScim2X509Certificates((Scim2X509Certificates) obj);
-        } else if (obj instanceof Scim2PhoneNumbers) {
-          user.setScim2PhoneNumbers((Scim2PhoneNumbers) obj);
-        } else if (obj instanceof Scim2Name) {
-          user.setName((Scim2Name) obj);
-        } else if (obj instanceof Scim2Addresses) {
-          //    user.setAddresses((Scim2Addresses) obj);
-        }
-        continue; // For complex type objects -  as we are working on all elements of complex type,
+        continue;
+        // For complex type objects -  as we are working on all elements of complex type,
         // so need to further going, that is the reason we have 'continue' here
       }
 

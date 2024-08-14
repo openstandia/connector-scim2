@@ -3,6 +3,7 @@ package com.exclamationlabs.connid.base.scim2.driver.rest;
 import com.exclamationlabs.connid.base.connector.driver.rest.BaseRestDriver;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestFaultProcessor;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestRequest;
+import com.exclamationlabs.connid.base.connector.driver.rest.RestResponseData;
 import com.exclamationlabs.connid.base.connector.logging.Logger;
 import com.exclamationlabs.connid.base.connector.model.IdentityModel;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
@@ -14,21 +15,8 @@ public class Scim2Driver extends BaseRestDriver<Scim2Configuration> {
 
   public Scim2Driver() {
     super();
-    // addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
-
     addInvocator(Scim2User.class, new Scim2UsersInvocator());
     addInvocator(Scim2Group.class, new Scim2GroupsInvocator());
-    // addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
-    // addInvocator(Scim2SlackGroup.class, new Scim2SlackGroupInvocator());
-
-    /*if(getConfiguration().getEnableSlackSchema()){
-      addInvocator(Scim2SlackUser.class, new Scim2SlackUsersInvocator());
-      addInvocator(Scim2Group.class, new Scim2SlackGroupInvocator());
-    }else{
-      addInvocator(Scim2User.class, new Scim2UsersInvocator());
-      addInvocator(Scim2Group.class, new Scim2GroupsInvocator());
-    }*/
-
   }
 
   @Override
@@ -57,19 +45,14 @@ public class Scim2Driver extends BaseRestDriver<Scim2Configuration> {
   public void test() throws ConnectorException {
     try {
       Logger.info(this, "Performing Scim2 Connector Test Procedure");
-      String adminUser =
-          executeRequest(
+      RestResponseData<String> rd = executeRequest(
                   new RestRequest.Builder<>(String.class)
                       .withGet()
                       .withRequestUri("/Users")
-                      .build())
-              .getResponseObject();
-      // if (adminUser == null || adminUser.getId() == null) {
-      //  throw new ConnectorException("Invalid admin user response");
-      // }
-      System.out.println("yada yada " + adminUser);
+                      .build());
+      String adminUser = rd.getResponseObject();
     } catch (Exception e) {
-      throw new ConnectorException("Test for Slack connection user failed.", e);
+      throw new ConnectorException("SCIM2 Connection test to Retrieve users failed.", e);
     }
   }
 

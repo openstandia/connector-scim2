@@ -24,29 +24,35 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
   public String create(Scim2Driver driver, Scim2SlackUser scim2SlackUser)
       throws ConnectorException {
 
-    Scim2User user = null;
     String id = null;
 
-    UserCreationRequest requestData = new UserCreationRequest(scim2SlackUser);
-
     RestRequest request =
-        new RestRequest.Builder<>(Scim2UserCreateResponse.class)
+        new RestRequest.Builder<>(Scim2SlackUser.class)
             .withPost()
-            .withRequestUri("/Users")
+            .withRequestUri(driver.getConfiguration().getUsersEndpointUrl())
             .withRequestBody(scim2SlackUser)
             .build();
 
-    System.out.println("Payload ---> " + request);
-
-    RestResponseData<Scim2UserCreateResponse> data = driver.executeRequest(request);
-    Scim2UserCreateResponse response = data.getResponseObject();
-
-    return "";
+    RestResponseData<Scim2SlackUser> data = driver.executeRequest(request);
+    Scim2SlackUser user = data.getResponseObject();
+    if (user != null) {
+      id = user.getId();
+    }
+    return id;
   }
 
   @Override
   public void update(Scim2Driver driver, String userId, Scim2SlackUser userModel)
-      throws ConnectorException {}
+      throws ConnectorException {
+
+    RestRequest req = new RestRequest.Builder<>(Scim2SlackUser.class)
+            .withPut()
+            .withRequestUri(driver.getConfiguration().getUsersEndpointUrl() + "/" + userId)
+            .withRequestBody(userModel)
+            .build();
+    RestResponseData<Scim2SlackUser> response = driver.executeRequest(req);
+    Scim2SlackUser updated = response.getResponseObject();
+  }
 
   @Override
   public void delete(Scim2Driver driver, String userId) throws ConnectorException {
@@ -55,9 +61,10 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
     req =
         new RestRequest.Builder<>(Void.class)
             .withDelete()
-            .withRequestUri("/Users/" + userId)
+            .withRequestUri(driver.getConfiguration().getUsersEndpointUrl() + "/" +userId)
             .build();
-    driver.executeRequest(req);
+    RestResponseData<Void> data = driver.executeRequest(req);
+    return;
   }
 
   @Override
@@ -69,30 +76,49 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
     RestRequest req =
         new RestRequest.Builder<>(Scim2SlackUser.class)
             .withGet()
-            .withRequestUri("/Users/" + objectId)
+            .withRequestUri(driver.getConfiguration().getUsersEndpointUrl() + "/" + objectId)
             .build();
     RestResponseData<Scim2SlackUser> response = driver.executeRequest(req);
     if (response.getResponseStatusCode() == 200) {
-      System.out.println(response.getResponseObject());
       user = response.getResponseObject();
-      //  getPhoneInfo(driver, user);
     }
 
     return user;
   }
 
+  public Scim2SlackUser getOneByName(Scim2Driver driver, String name) {
+    Scim2SlackUser user = null;
+    String queryString ="?filter=userName%20eq%20%22"+name+"%22";
+    RestRequest req = new RestRequest.Builder<>(ListSlackUsersResponse.class)
+                    .withGet()
+                    .withRequestUri(driver.getConfiguration().getUsersEndpointUrl() + queryString)
+                    .build();
+    RestResponseData<ListSlackUsersResponse> response = driver.executeRequest(req);
+    if (response.getResponseStatusCode() == 200) {
+      List<Scim2SlackUser> list = response.getResponseObject().getResources();
+      if ( list != null && list.size() > 0 ) {
+        user = list.get(0);
+      }
+    }
+    return user;
+  }
+
+  public Scim2SlackUser getOneByName(Scim2Driver driver, String userName, Map<String, Object> prefetchDataMap){
+    return getOneByName(driver, userName);
+  }
+
   public Set<Scim2SlackUser> getUsersByStatus(
       Scim2Driver scim2Driver, String status, ResultsPaginator paginator) {
 
-    Set<Scim2SlackUser> slackUsers = new HashSet<>();
+    List<Scim2SlackUser> slackUsers = new ArrayList<>();
     String additionalQueryString = "";
     RestRequest request =
-        new RestRequest.Builder<>(ListUsersResponse.class)
+        new RestRequest.Builder<>(ListSlackUsersResponse.class)
             .withGet()
             .withRequestUri("/Users")
             .build();
-    RestResponseData<ListUsersResponse> data = scim2Driver.executeRequest(request);
-    ListUsersResponse response = data.getResponseObject();
+    RestResponseData<ListSlackUsersResponse> data = scim2Driver.executeRequest(request);
+    ListSlackUsersResponse response = data.getResponseObject();
 
     if (response != null) {
       // slackUsers = data.getResponseObject().getResources();
@@ -127,7 +153,7 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
                 .withGet()
                 .withRequestUri("/Users" + additionalQueryString)
                 .build();
-        RestResponseData<ListUsersResponse> data1 = scim2Driver.executeRequest(request);
+        RestResponseData<ListSlackUsersResponse> data1 = scim2Driver.executeRequest(request);
         response = data1.getResponseObject();
         if (response != null) {
           paginator.setTotalResults(response.getTotalResults().intValue());
@@ -164,23 +190,10 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
   }
 
   @Override
-  public Set<Scim2SlackUser> getAll(
-      Scim2Driver scim2Driver,
-      ResultsFilter filter,
-      ResultsPaginator paginator,
-      Integer forceNumber)
+  public Set<Scim2SlackUser> getAll(Scim2Driver driver, ResultsFilter filter, ResultsPaginator paginator,Integer forceNumber)
       throws ConnectorException {
-    String status = null;
     Set<Scim2SlackUser> allUsers = null;
-    Set<Scim2SlackUser> inactiveUsers = null;
-    Set<Scim2SlackUser> activeUsers = null;
-
-    if (scim2Driver.getConfiguration().getEnableSlackSchema()) {
-      allUsers = getUsersByStatus(scim2Driver, filter.getValue(), paginator);
-    } else if (scim2Driver.getConfiguration().getEnableAWSSchema()) {
-      // AWS Invocator
-    }
-
+    allUsers = getUsersByStatus(driver, filter.getValue(), paginator);
     return allUsers;
   }
 }
