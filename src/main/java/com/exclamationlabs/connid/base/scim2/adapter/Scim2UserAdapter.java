@@ -8,7 +8,6 @@ import com.exclamationlabs.connid.base.connector.util.GuardedStringUtil;
 import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackUserAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
-import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import java.util.*;
 
 import com.google.gson.Gson;

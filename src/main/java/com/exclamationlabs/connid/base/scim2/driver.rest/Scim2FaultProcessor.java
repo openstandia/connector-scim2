@@ -5,7 +5,7 @@ import static com.exclamationlabs.connid.base.scim2.model.response.fault.ErrorRe
 import com.exclamationlabs.connid.base.connector.driver.exception.DriverRenewableTokenExpiredException;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestFaultProcessor;
 import com.exclamationlabs.connid.base.connector.logging.Logger;
-import com.exclamationlabs.connid.base.scim2.model.response.fault.ErrorResponse;
+import com.exclamationlabs.connid.base.scim2.model.response.fault.Scim2ErrorResponse;
 import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import org.apache.commons.codec.Charsets;
@@ -56,48 +56,45 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
   }
 
   private void handleFaultResponse(String rawResponse, GsonBuilder gsonBuilder) {
-    ErrorResponse faultData = gsonBuilder.create().fromJson(rawResponse, ErrorResponse.class);
+    Scim2ErrorResponse faultData = gsonBuilder.create().fromJson(rawResponse, Scim2ErrorResponse.class);
     if (faultData != null) {
-      if (faultData.getCode() != null) {
+      if (faultData.getStatus() != null) {
         if (checkRecognizedFaultCodes(faultData)) {
-          // other fault condition
+          // Report the  fault condition
           throw new ConnectorException(
-              "Unknown fault received from Scim Backend.  Code: "
-                  + faultData.getCode()
+              "SCIM2 Error.  Code: "
+                  + faultData.getStatus()
                   + "; Message: "
-                  + faultData.getMessage());
+                  + faultData.getDetail());
         } else {
-          // Logger.warn(this, faultData.getMessage());
+          Logger.info(this, faultData.getDetail());
           return;
         }
       }
     }
-    throw new ConnectorException(
-        "Unknown fault received from Scim Backend. Raw response JSON: " + rawResponse);
+    throw new ConnectorException("Error received from Scim Backend." + rawResponse);
   }
 
-  private Boolean checkRecognizedFaultCodes(ErrorResponse faultData) {
-    switch (faultData.getCode()) {
-      case PAID_SUBSCRIPTION_REQUIRED:
-        throw new PaidAccountRequiredException(faultData.getMessage());
-
-      case USER_NOT_FOUND:
-      case GROUP_NOT_FOUND:
-        // ignore fault and return to Midpoint
+  /**
+   * Check the fault status code
+   * @param error Scim2 Error
+   * @return false when the error can be ignored
+   */
+  private Boolean checkRecognizedFaultCodes(Scim2ErrorResponse error) {
+    switch (error.getStatus()) {
+      case HTTP_CONFLICT:
+        throw new AlreadyExistsException("User or Group already exists.");
+      case HTTP_BAD_REQUEST:
+        throw new ConnectorException("SCIM2 Bad Request. "
+                + "status: "
+                + error.getStatus()
+                + "; scimType: "
+                + error.getScimType()
+                + "; detail: "
+                + error.getDetail());
+      case HTTP_NOT_FOUND:
+        // ignore fault and return to invocator
         return false;
-
-      case GROUP_NAME_ALREADY_EXISTS:
-        throw new AlreadyExistsException(
-            "Supplied User/Group already exists. Please enter different input.");
-      case USER_ALREADY_EXISTS:
-        return false;
-
-      case VALIDATION_FAILED:
-        throw new InvalidAttributeValueException(
-            "Validation Failed. " + faultData.getErrorDetails());
-      case TOKEN_EXPIRED:
-        throw new DriverRenewableTokenExpiredException(
-            String.valueOf(faultData.getCode()) + " " + faultData.getMessage());
     }
     return true;
   }

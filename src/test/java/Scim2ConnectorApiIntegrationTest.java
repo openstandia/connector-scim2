@@ -1,4 +1,3 @@
-import static com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute.GROUP_NAME;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.exclamationlabs.connid.base.connector.configuration.ConfigurationReader;
@@ -104,7 +103,7 @@ public class Scim2ConnectorApiIntegrationTest
 
     Set<String> phones = new HashSet<>();
     phones.add(composeComplexType("954-555-1776", "work", null, true));
-    phones.add(composeComplexType("954-555-1800", "home", null, false));
+    phones.add(composeComplexType("954-555-1800", "mobile", null, false));
     attributes.add(new AttributeBuilder().setName("phones").addValue(phones).build());
 
     Set<String> emails = new HashSet<>();
@@ -214,8 +213,10 @@ public class Scim2ConnectorApiIntegrationTest
   @Order(210)
   public void test210GroupCreate() {
     Set<Attribute> attributes = new HashSet<>();
+    /*
     attributes.add(
             new AttributeBuilder().setName(GROUP_NAME.name()).addValue(generatedGroupName).build());
+            */
     generatedGroupId =
             getConnectorFacade()
                     .create(ObjectClass.GROUP, attributes, new OperationOptionsBuilder().build())

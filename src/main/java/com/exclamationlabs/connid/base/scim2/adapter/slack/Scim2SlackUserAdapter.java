@@ -1,24 +1,25 @@
 package com.exclamationlabs.connid.base.scim2.adapter.slack;
 
+import static com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType.STRING;
 import static com.exclamationlabs.connid.base.scim2.attribute.slack.Scim2SlackUserAttribute.*;
-import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
-import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
-import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType;
 import com.exclamationlabs.connid.base.scim2.adapter.Scim2UserAdapter;
-import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
-import java.io.IOException;
 import java.util.*;
-import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.Attribute;
+import org.identityconnectors.framework.common.objects.AttributeInfo;
 
 public class Scim2SlackUserAdapter extends Scim2UserAdapter {
+
+  public Set<ConnectorAttribute> getSlackConnectorAttributes(){
+    Set<ConnectorAttribute> attributes = new HashSet<>();
+    attributes.add(new ConnectorAttribute(guest_type.name(), STRING));
+    attributes.add(new ConnectorAttribute(guest_expiration.name(), STRING));
+    attributes.add(new ConnectorAttribute(guest_channels.name(), STRING, AttributeInfo.Flags.MULTIVALUED));
+    attributes.add(new ConnectorAttribute(profile_startDate.name(), STRING));
+    return attributes;
+  }
 
   @Override
   public Set<ConnectorAttribute> getConnectorAttributes() {
@@ -29,6 +30,7 @@ public class Scim2SlackUserAdapter extends Scim2UserAdapter {
     result.addAll(getEnterpriseConnectorAttributes());
     // call slack guest attributes method
     // call slack profile attributes method
+    result.addAll(getSlackConnectorAttributes());
     return result;
   }
 
