@@ -13,8 +13,6 @@ import java.util.StringJoiner;
 import org.apache.commons.lang3.StringUtils;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
-import org.identityconnectors.framework.common.objects.filter.Filter;
-import org.identityconnectors.framework.common.objects.filter.FilterVisitor;
 import org.identityconnectors.test.common.ToListResultsHandler;
 import org.junit.jupiter.api.*;
 
@@ -22,12 +20,17 @@ import org.junit.jupiter.api.*;
 public class Scim2ConnectorApiIntegrationTest
     extends ApiIntegrationTest<Scim2Configuration, Scim2Connector> {
 
-  private static final String generatedGroupName = "redacted";
+  private static final String generatedGroupName = "Test Group";
   private static String generatedUserId;
   private static String generatedGroupId;
   private static final String existingEntUser  = "U06SRNW2AS0";
-  private static final String existingStdUser  = "U07GJHF2BGD";
-  private static final String existingUserName = "services-dev";
+  private static final String existingGroupName = "Test Group";
+  private static final String existingUserName = "gwashington";
+  private static final String idGeorgeWashington = "U07H3EQPYJV";
+  private static final String idThomasJefferson  = "U07GJHF2BGD";
+  private static final String idJeffersonDavis = "U07DUFCB78X";
+  private static final String idTestGroup      = "S07H5SNR7U5";
+  private static final String idScim2Group     = "S07H28BETDL";
 
   protected String composeComplexType(String value, String type, String display, Boolean primary){
     StringJoiner joiner = new StringJoiner(",", "{", "}");
@@ -81,7 +84,7 @@ public class Scim2ConnectorApiIntegrationTest
 
   @Test
   @Order(100)
-  public void test100UserCreate() {
+  public void testUserCreate() {
     // Creates a user that will be deleted at the end
     ObjectClass objClazz = new ObjectClass("Scim2User");
     Set<Attribute> attributes = new HashSet<>();
@@ -100,11 +103,12 @@ public class Scim2ConnectorApiIntegrationTest
     attributes.add(new AttributeBuilder().setName("title").addValue("President").build());
     attributes.add(new AttributeBuilder().setName("timezone").addValue("America/New_York").build());
     attributes.add(new AttributeBuilder().setName("userType").addValue("Employee").build());
+    attributes.add(new AttributeBuilder().setName("userType").addValue("multi").build());
 
     Set<String> phones = new HashSet<>();
     phones.add(composeComplexType("954-555-1776", "work", null, true));
     phones.add(composeComplexType("954-555-1800", "mobile", null, false));
-    attributes.add(new AttributeBuilder().setName("phones").addValue(phones).build());
+    attributes.add(new AttributeBuilder().setName("phoneNumbers").addValue(phones).build());
 
     Set<String> emails = new HashSet<>();
     emails.add(composeComplexType("services-dev+gwwork@provisioniam.com", "work", null, true));
@@ -125,30 +129,39 @@ public class Scim2ConnectorApiIntegrationTest
 
   @Test
   @Order(110)
-  public void test110UpdateUser()
+  public void testUserUpdate()
   {
     ToListResultsHandler listHandler = new ToListResultsHandler();
     ObjectClass objClazz = new ObjectClass("Scim2User");
     OperationOptions options = new OperationOptionsBuilder().build();
-    Uid uid = new Uid("U07GJHF2BGD");
+    Uid uid = new Uid(idThomasJefferson);
     Set<AttributeDelta> delta = new HashSet<>();
     delta.add(new AttributeDeltaBuilder().setName("userName").addValueToReplace("tjefferson").build());
     Set<String> emails = new HashSet<>();
     emails.add(composeComplexType("services-dev+tjwork@provisioniam.com", "work", null, true));
     emails.add(composeComplexType("services-dev+tjhome@provisioniam.com", "home", null, null));
     delta.add(new AttributeDeltaBuilder().setName("emails").addValueToReplace(emails).build());
+    Set<String> phones = new HashSet<>();
+    phones.add(composeComplexType("954-555-1776", "work", null, true));
+    phones.add(composeComplexType("954-555-1800", "mobile", null, false));
+    delta.add(new AttributeDeltaBuilder().setName("phoneNumbers").addValueToReplace(phones).build());
     delta.add(new AttributeDeltaBuilder().setName(OperationalAttributes.ENABLE_NAME).addValueToReplace(true).build());
+    delta.add(new AttributeDeltaBuilder().setName("employeeNumber").addValueToReplace("51234").build());
+    delta.add(new AttributeDeltaBuilder().setName("costCenter").addValueToReplace("Research").build());
+    delta.add(new AttributeDeltaBuilder().setName("organization").addValueToReplace("ProvisionIAM").build());
+    delta.add(new AttributeDeltaBuilder().setName("division").addValueToReplace("Services").build());
+    delta.add(new AttributeDeltaBuilder().setName("department").addValueToReplace("Development").build());
     Set<AttributeDelta> output = getConnectorFacade().updateDelta(objClazz, uid, delta, options);
     assertNotNull(output);
   }
 
   @Test
   @Order(120)
-  public void test120UserGet() {
+  public void testUserGet() {
     ToListResultsHandler listHandler = new ToListResultsHandler();
     ObjectClass objClazz = new ObjectClass("Scim2User");
     Attribute id =
-        new AttributeBuilder().setName(Uid.NAME).addValue(existingStdUser).build();
+        new AttributeBuilder().setName(Uid.NAME).addValue(idThomasJefferson).build();
 
     getConnectorFacade()
         .search(
@@ -160,21 +173,41 @@ public class Scim2ConnectorApiIntegrationTest
     assertEquals(1, users.size());
     String userId = users.get(0).getAttributeByName(Uid.NAME).getValue().get(0).toString();
     assertTrue(StringUtils.isNotBlank(userId));
-    assertEquals(existingStdUser, userId);
+    assertEquals(idThomasJefferson, userId);
   }
+
   @Test
   @Order(125)
-  public void test125UserGetEnterprise() {
+  public void testUserGetByName() {
+    ToListResultsHandler listHandler = new ToListResultsHandler();
+    ObjectClass objClazz = new ObjectClass("Scim2User");
+    Attribute name =
+            new AttributeBuilder().setName(Name.NAME).addValue(existingUserName).build();
+
+    getConnectorFacade().search(
+                    objClazz,
+                    new EqualsFilter(name),
+                    listHandler,
+                    new OperationOptionsBuilder().build());
+    List<ConnectorObject> users = listHandler.getObjects();
+    assertEquals(1, users.size());
+    String userName = users.get(0).getAttributeByName(Name.NAME).getValue().get(0).toString();
+    assertEquals(existingUserName, userName);
+  }
+
+  @Test
+  @Order(130)
+  public void testUserGetEnterprise() {
     ToListResultsHandler listHandler = new ToListResultsHandler();
     ObjectClass objClazz = new ObjectClass("Scim2User");
     Attribute id =
             new AttributeBuilder().setName(Uid.NAME).addValue(existingEntUser).build();
 
     getConnectorFacade().search(
-                    objClazz,
-                    new EqualsFilter(id),
-                    listHandler,
-                    new OperationOptionsBuilder().build());
+            objClazz,
+            new EqualsFilter(id),
+            listHandler,
+            new OperationOptionsBuilder().build());
     List<ConnectorObject> users = listHandler.getObjects();
     assertEquals(1, users.size());
     String userId = users.get(0).getAttributeByName(Uid.NAME).getValue().get(0).toString();
@@ -182,51 +215,100 @@ public class Scim2ConnectorApiIntegrationTest
   }
 
   @Test
-  //@Disabled
-  public void test150GetAllUsers() {
+  @Order(150)
+  public void testUserList() {
     ToListResultsHandler listHandler = new ToListResultsHandler();
     ObjectClass objClazz = new ObjectClass("Scim2User");
     getConnectorFacade()
         .search(
-            objClazz,
-            new Filter() {
-              @Override
-              public boolean accept(ConnectorObject obj) {
-                return false;
-              }
-
-              @Override
-              public <R, P> R accept(FilterVisitor<R, P> v, P p) {
-                return null;
-              }
-            },
+            objClazz,null,
             listHandler,
             new OperationOptionsBuilder().build());
-    // new Scim2Connector().executeQuery(ObjectClass.ACCOUNT, "", listHandler, new
-    // OperationOptionsBuilder().build());
     List<ConnectorObject> users = listHandler.getObjects();
     assertNotNull(users);
     assertTrue(users.size() > 0);
   }
+
   @Test
-  @Disabled
-  @Order(210)
-  public void test210GroupCreate() {
-    Set<Attribute> attributes = new HashSet<>();
-    /*
-    attributes.add(
-            new AttributeBuilder().setName(GROUP_NAME.name()).addValue(generatedGroupName).build());
-            */
-    generatedGroupId =
-            getConnectorFacade()
-                    .create(ObjectClass.GROUP, attributes, new OperationOptionsBuilder().build())
-                    .getUidValue();
+  @Order(200)
+  public void testGroupList() {
+    ToListResultsHandler listHandler = new ToListResultsHandler();
+    ObjectClass objClazz = new ObjectClass("Scim2Group");
+    OperationOptions options = new OperationOptionsBuilder().build();
+    getConnectorFacade().search(objClazz,null,listHandler, options);
+    List<ConnectorObject> groups = listHandler.getObjects();
+    assertNotNull(groups);
   }
 
   @Test
+  @Order(210)
+  public void testGroupCreate() {
+    Set<Attribute> attributes = new HashSet<>();
+    ObjectClass objGroup = new ObjectClass("Scim2Group");
+    OperationOptions options = new OperationOptionsBuilder().build();
+    attributes.add(new AttributeBuilder().setName("displayName").addValue("ProvisionTest").build());
+    Set<String> members = new HashSet<>();
+    members.add(composeComplexType(idGeorgeWashington, "User", null, null));
+    members.add(composeComplexType(idJeffersonDavis, "User", null, null));
+    attributes.add(new AttributeBuilder().setName("members").addValue(members).build());
+    generatedGroupId = getConnectorFacade().create(objGroup, attributes, options).getUidValue();
+    assertNotNull(generatedGroupId);
+  }
+
+  @Test
+  @Order(220)
+  public void testGroupGetByName()
+  {
+    ObjectClass objGroup = new ObjectClass("Scim2Group");
+    OperationOptions options = new OperationOptionsBuilder().build();
+    ToListResultsHandler listHandler = new ToListResultsHandler();
+    Attribute name =
+            new AttributeBuilder().setName(Name.NAME).addValue(existingGroupName).build();
+    getConnectorFacade().search(objGroup,new EqualsFilter(name),listHandler, options);
+    List<ConnectorObject> groups = listHandler.getObjects();
+    assertNotNull(groups);
+    assertEquals(1, groups.size());
+    String groupName = groups.get(0).getAttributeByName(Name.NAME).getValue().get(0).toString();
+  }
+
+  @Test
+  @Order(230)
+  public void testGroupUpdateName()
+  {
+    ObjectClass objGroup = new ObjectClass("Scim2Group");
+    OperationOptions options = new OperationOptionsBuilder().build();
+    Uid uid = new Uid(idScim2Group);
+    Set<AttributeDelta> delta = new HashSet<>();
+    delta.add(new AttributeDeltaBuilder().setName(Name.NAME).addValueToReplace("SCIM2").build());
+    Set<AttributeDelta> output = getConnectorFacade().updateDelta(objGroup, uid, delta, options);
+    assertNotNull(output);
+  }
+
+  @Test
+  @Order(230)
+  public void testGroupUpdateMembers()
+  {
+    ObjectClass objGroup = new ObjectClass("Scim2Group");
+    OperationOptions options = new OperationOptionsBuilder().build();
+    Uid uid = new Uid(idScim2Group);
+    Set<AttributeDelta> delta = new HashSet<>();
+    delta.add(new AttributeDeltaBuilder().setName(Name.NAME).addValueToReplace("SCIM2").build());
+    Set<AttributeDelta> output = getConnectorFacade().updateDelta(objGroup, uid, delta, options);
+    assertNotNull(output);
+  }
+
+  @Test
+  @Disabled
   @Order(310)
-  public void test390UserDelete() {
+  public void testUserDelete() {
     ObjectClass objClazz = new ObjectClass("Scim2User");
+    getConnectorFacade().delete(objClazz, new Uid("U07GJHF2BGD"), new OperationOptionsBuilder().build());
+  }
+  @Test
+  @Disabled
+  @Order(320)
+  public void testGroupDelete() {
+    ObjectClass objClazz = new ObjectClass("Scim2Group");
     getConnectorFacade().delete(objClazz, new Uid("U07GJHF2BGD"), new OperationOptionsBuilder().build());
   }
 }

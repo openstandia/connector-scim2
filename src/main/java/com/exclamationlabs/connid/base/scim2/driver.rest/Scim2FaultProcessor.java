@@ -85,6 +85,12 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
       case HTTP_CONFLICT:
         throw new AlreadyExistsException("User or Group already exists.");
       case HTTP_BAD_REQUEST:
+        if (error.getDetail() != null
+                && error.getDetail().toLowerCase().contains("already")
+                &&  error.getDetail().toLowerCase().contains("exists"))
+        {
+          throw new AlreadyExistsException("User or Group already exists.");
+        }
         throw new ConnectorException("SCIM2 Bad Request. "
                 + "status: "
                 + error.getStatus()

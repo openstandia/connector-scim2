@@ -20,6 +20,7 @@ public class Scim2User implements IdentityModel {
   private String id;
   private List<Scim2ComplexType> ims;
   private String locale;
+  private Scim2Meta meta;
   private Scim2Name name;
   private String nickName;
   private String password;
@@ -103,6 +104,11 @@ public class Scim2User implements IdentityModel {
   public String getLocale()
   {
     return locale;
+  }
+
+  public Scim2Meta getMeta()
+  {
+    return meta;
   }
 
   public Scim2Name getName()
@@ -233,6 +239,11 @@ public class Scim2User implements IdentityModel {
   public void setLocale(String locale)
   {
     this.locale = locale;
+  }
+
+  public void setMeta(Scim2Meta meta)
+  {
+    this.meta = meta;
   }
 
   public void setName(Scim2Name name)

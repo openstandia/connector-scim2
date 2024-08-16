@@ -61,6 +61,7 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     result.add(new ConnectorAttribute(timezone.name(), STRING));
     result.add(new ConnectorAttribute(OperationalAttributes.ENABLE_NAME,active.name(), BOOLEAN));
     result.add(new ConnectorAttribute(OperationalAttributes.PASSWORD_NAME,password.name(), GUARDED_STRING, NOT_READABLE, NOT_RETURNED_BY_DEFAULT));
+    result.add(new ConnectorAttribute(addresses.name(), STRING, MULTIVALUED));
     result.add(new ConnectorAttribute(emails.name(), STRING, MULTIVALUED));
     result.add(new ConnectorAttribute(phoneNumbers.name(), STRING, MULTIVALUED));
     result.add(new ConnectorAttribute(ims.name(), STRING, MULTIVALUED));
@@ -348,7 +349,7 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
         schemaList.add(SCIM2_ENTERPRISE_USER_SCHEMA);
         user.setSchemas(schemaList);
       }
-      else if (user.getSchemas().contains(SCIM2_ENTERPRISE_USER_SCHEMA) )
+      else if (!user.getSchemas().contains(SCIM2_ENTERPRISE_USER_SCHEMA) )
       {
         user.getSchemas().add(SCIM2_ENTERPRISE_USER_SCHEMA);
       }
@@ -585,7 +586,7 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
       schemaList.add(SCIM2_CORE_USER_SCHEMA);
       user.setSchemas(schemaList);
     }
-    else if (user.getSchemas().contains(SCIM2_CORE_USER_SCHEMA) ) {
+    else if (!user.getSchemas().contains(SCIM2_CORE_USER_SCHEMA) ) {
       user.getSchemas().add(SCIM2_CORE_USER_SCHEMA);
     }
 

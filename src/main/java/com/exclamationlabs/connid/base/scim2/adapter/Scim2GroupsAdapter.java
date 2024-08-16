@@ -10,15 +10,15 @@ import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
 import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackGroupsAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringJoiner;
 
+import java.util.*;
+
+import com.google.gson.Gson;
 import org.identityconnectors.framework.common.objects.*;
 
 public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configuration> {
   public static final String SCIM2_GROUP ="Scim2Group";
+  public static final String SCIM2_CORE_GROUP_SCHEMA = "urn:ietf:params:scim:schemas:core:2.0:Group";
   @Override
   public ObjectClass getType() {
     return new ObjectClass(SCIM2_GROUP);
@@ -29,6 +29,23 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
     return Scim2Group.class;
   }
 
+  private Set<Map<String, String>> getMembersFromJSON(Set<String> jsonMembers)
+  {
+    Set<Map<String, String>> members = null;
+    if ( jsonMembers != null && !jsonMembers.isEmpty() ) {
+      members = new HashSet<>();
+      for (String jsonMember : jsonMembers) {
+        Map<String, String> member = new HashMap<>();
+        Gson gson = new Gson();
+        Map<String, Object> memberObject = gson.fromJson(jsonMember, Map.class);
+        for (Map.Entry<String, Object> entry : memberObject.entrySet()) {
+          member.put(entry.getKey(), entry.getValue().toString());
+        }
+        members.add(member);
+      }
+    }
+    return members;
+  }
   @Override
   public Set<ConnectorAttribute> getConnectorAttributes() {
 
@@ -53,13 +70,6 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
        * value, $ref, and type
        */
       result.add(new ConnectorAttribute(members.name(), STRING, MULTIVALUED));
-
-      // Identifier for the member of this Group.
-      // result.add(new ConnectorAttribute(members_value.name(), STRING, MULTIVALUED));
-      // The URI corresponding to a SCIM resource that is a member of this Group.
-      // result.add(new ConnectorAttribute(members_$ref.name(), STRING, MULTIVALUED));
-      // A label indicating the type of resource. For example, 'User' or 'Group'.
-      // result.add(new ConnectorAttribute(members_type.name(), STRING, MULTIVALUED));
     }
     else
     {
@@ -89,8 +99,9 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
     if ( group.getMembers() != null && group.getMembers().size() > 0 )
     {
       String member = null;
-      StringJoiner joiner = new StringJoiner(",", "{", "}");
+
       for(Map<String, String> item: group.getMembers()) {
+          StringJoiner joiner = new StringJoiner(",", "{", "}");
           item.forEach((key, value) -> {
             joiner.add(String.format("\"%s\":\"%s\"", key, value));
           });
@@ -111,11 +122,23 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
 
     Scim2Group group = new Scim2Group();
     group.setId(AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes));
-    group.setDisplayName(
-        AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, displayName));
+    if(group.getId() == null || group.getId().isEmpty())
+    {
+      group.setId(AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, id));
+    }
+    group.setDisplayName(AdapterValueTypeConverter.getIdentityNameAttributeValue(attributes));
+    if ( group.getDisplayName() == null || group.getDisplayName().isEmpty()){
+      group.setDisplayName(
+              AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, displayName));
+    }
     group.setExternalId(
         AdapterValueTypeConverter.getSingleAttributeValue(String.class, attributes, externalId));
 
+    Set<String> jsonMembers = readAssignments(attributes, members);
+    group.setMembers(getMembersFromJSON(jsonMembers));
+    Set<String> schemaList = new HashSet<>();
+    schemaList.add(SCIM2_CORE_GROUP_SCHEMA);
+    group.setSchemas(schemaList);
     return group;
   }
 }

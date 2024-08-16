@@ -1,5 +1,6 @@
 package com.exclamationlabs.connid.base.scim2.model.response;
 
+import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -8,11 +9,11 @@ import java.util.Set;
 /**
  * Typical "urn:ietf:params:scim:api:messages:2.0:ListResponse"
  */
-public class Scim2ListResponse
+public class ListGroupResponse
 {
     private Integer itemsPerPage;
     @SerializedName("Resources")
-    private List<?> resources;
+    private List<Scim2Group> resources;
     private Set<String> schemas;
     private Integer startIndex;
     private Integer totalResults;
@@ -22,7 +23,7 @@ public class Scim2ListResponse
         return itemsPerPage;
     }
 
-    public List<?> getResources()
+    public List<Scim2Group> getResources()
     {
         return resources;
     }
@@ -47,7 +48,7 @@ public class Scim2ListResponse
         this.itemsPerPage = itemsPerPage;
     }
 
-    public void setResources(List<?> resources)
+    public void setResources(List<Scim2Group> resources)
     {
         this.resources = resources;
     }
