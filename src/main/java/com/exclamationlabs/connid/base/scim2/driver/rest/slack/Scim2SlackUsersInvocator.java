@@ -5,12 +5,10 @@ import com.exclamationlabs.connid.base.connector.driver.rest.RestRequest;
 import com.exclamationlabs.connid.base.connector.driver.rest.RestResponseData;
 import com.exclamationlabs.connid.base.connector.results.ResultsFilter;
 import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
+import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2Driver;
-import com.exclamationlabs.connid.base.scim2.model.Scim2User;
-import com.exclamationlabs.connid.base.scim2.model.request.UserCreationRequest;
+import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2UsersInvocator;
 import com.exclamationlabs.connid.base.scim2.model.response.ListSlackUsersResponse;
-import com.exclamationlabs.connid.base.scim2.model.response.ListUsersResponse;
-import com.exclamationlabs.connid.base.scim2.model.response.Scim2UserCreateResponse;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import java.util.*;
 import org.identityconnectors.common.logging.Log;
@@ -72,7 +70,7 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
       Scim2Driver driver, String objectId, Map<String, Object> prefetchDataMap)
       throws ConnectorException {
     Scim2SlackUser user = null;
-    driver.getConfiguration().setCurrentToken(driver.getConfiguration().getToken());
+
     RestRequest req =
         new RestRequest.Builder<>(Scim2SlackUser.class)
             .withGet()
@@ -107,79 +105,62 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
     return getOneByName(driver, userName);
   }
 
-  public Set<Scim2SlackUser> getUsersByStatus(
-      Scim2Driver scim2Driver, String status, ResultsPaginator paginator) {
-
-    List<Scim2SlackUser> slackUsers = new ArrayList<>();
-    String additionalQueryString = "";
+  public Set<Scim2SlackUser> getUsersList( Scim2Driver driver, ResultsFilter filter, ResultsPaginator paginator) {
+    Scim2Configuration config = driver.getConfiguration();
+    List<Scim2SlackUser> userList = new ArrayList<>();
+    String filterParameter = Scim2UsersInvocator.getFilterParameter(filter);
+    String pagingParameter = Scim2UsersInvocator.getPagingParameter(paginator);
+    String query = "";
+    if ( pagingParameter != null && filterParameter != null )
+    {
+      query = "?" + pagingParameter + "&" +  filterParameter ;
+    }
+    else if (pagingParameter != null )
+    {
+      query = "?" + pagingParameter;
+    }
+    else if (filterParameter != null )
+    {
+      query = "?" + filterParameter;
+    }
     RestRequest request =
         new RestRequest.Builder<>(ListSlackUsersResponse.class)
             .withGet()
-            .withRequestUri("/Users")
+            .withRequestUri(config.getUsersEndpointUrl() + query )
             .build();
-    RestResponseData<ListSlackUsersResponse> data = scim2Driver.executeRequest(request);
+    RestResponseData<ListSlackUsersResponse> data = driver.executeRequest(request);
     ListSlackUsersResponse response = data.getResponseObject();
 
-    if (response != null) {
-      // slackUsers = data.getResponseObject().getResources();
-      // LOG.error("Slack Response - DSR " + response);
-      slackUsers = response.getResources();
-      paginator.setTotalResults(response.getTotalResults().intValue());
-      //  paginator.setNumberOfProcessedPages(response.getStartIndex().intValue());
-      paginator.setNumberOfTotalPages(
-          response.getTotalResults().intValue() / response.getItemsPerPage().intValue());
-      paginator.setPageSize(response.getItemsPerPage().intValue());
-      if (data.getResponseObject().getResources() != null
-          && data.getResponseObject().getResources().size() > 0) {
+    if ( response != null && data.getResponseStatusCode() == 200 ) {
+      userList = response.getResources();
+      if (userList != null && userList.size() > 0) {
+        paginator.setTotalResults(response.getTotalResults());
+        Integer pages = response.getTotalResults() / response.getItemsPerPage();
+        if (response.getTotalResults() % response.getItemsPerPage() > 0 )
+        {
+          pages++;
+        }
+        paginator.setNumberOfTotalPages( pages);
+        // paginator.setPageSize(response.getItemsPerPage());
         if (paginator.getNumberOfProcessedResults() == null) {
           paginator.setNumberOfProcessedResults(0);
         }
-        paginator.setNumberOfProcessedResults(
-            paginator.getNumberOfProcessedResults()
-                + data.getResponseObject().getResources().size());
-      }
-
-      while (true) {
-        assert response != null;
-        if (!(response.getStartIndex() + response.getItemsPerPage() < response.getTotalResults()))
-          break;
-        // Integer pageNumber = response.getPageNumber() + 1;
-        int startIndex = response.getStartIndex() + response.getItemsPerPage();
-
-        additionalQueryString =
-            "?startIndex=" + startIndex + "&itemsPerPage=" + response.getItemsPerPage();
-        request =
-            new RestRequest.Builder<>(ListSlackUsersResponse.class)
-                .withGet()
-                .withRequestUri("/Users" + additionalQueryString)
-                .build();
-        RestResponseData<ListSlackUsersResponse> data1 = scim2Driver.executeRequest(request);
-        response = data1.getResponseObject();
-        if (response != null) {
-          paginator.setTotalResults(response.getTotalResults().intValue());
-          // paginator.setNumberOfProcessedPages(response.getPageNumber());
-          paginator.setNumberOfTotalPages(response.getTotalResults().intValue());
-          paginator.setPageSize(response.getItemsPerPage());
-          if (data1.getResponseObject().getResources() != null
-              && !data1.getResponseObject().getResources().isEmpty()) {
-            paginator.setNumberOfProcessedResults(
-                paginator.getNumberOfProcessedResults()
-                    + data1.getResponseObject().getResources().size());
-            // slackUsers = response.getResources();
-
-            slackUsers.addAll(data1.getResponseObject().getResources());
-          }
+        paginator.setNumberOfProcessedResults(paginator.getNumberOfProcessedResults() + userList.size());
+        if ( paginator.getNumberOfProcessedPages() == null )
+        {
+          paginator.setNumberOfProcessedPages(0);
+        }
+        paginator.setNumberOfProcessedPages(paginator.getNumberOfProcessedPages()+1);
+        if ( paginator.getTotalResults() == paginator.getNumberOfProcessedResults() ) {
+          paginator.setNoMoreResults(true);
         }
       }
+      else {
+        paginator.setNoMoreResults(true);
+      }
     }
-
-    List<Scim2SlackUser> dataList = new ArrayList<>(slackUsers);
-
-    // Get the first 0-9 elements (total 10 elements)
-    List<Scim2SlackUser> subList = dataList.subList(10, Math.min(14, dataList.size()));
-
-    // Convert the sublist back to a Set
-    Set<Scim2SlackUser> subSet = new LinkedHashSet<>(subList);
+    // Convert the list to a Set
+    Set<Scim2SlackUser> subSet = new HashSet<>(userList);
 
     return subSet;
   }
@@ -193,7 +174,7 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
   public Set<Scim2SlackUser> getAll(Scim2Driver driver, ResultsFilter filter, ResultsPaginator paginator,Integer forceNumber)
       throws ConnectorException {
     Set<Scim2SlackUser> allUsers = null;
-    allUsers = getUsersByStatus(driver, filter.getValue(), paginator);
+    allUsers = getUsersList(driver, filter, paginator);
     return allUsers;
   }
 }
