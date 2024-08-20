@@ -3,6 +3,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.exclamationlabs.connid.base.connector.configuration.ConfigurationReader;
 import com.exclamationlabs.connid.base.connector.test.ApiIntegrationTest;
 import com.exclamationlabs.connid.base.scim2.Scim2Connector;
+import com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 
 import java.util.HashSet;
@@ -292,7 +293,16 @@ public class Scim2ConnectorApiIntegrationTest
     OperationOptions options = new OperationOptionsBuilder().build();
     Uid uid = new Uid(idScim2Group);
     Set<AttributeDelta> delta = new HashSet<>();
-    delta.add(new AttributeDeltaBuilder().setName(Name.NAME).addValueToReplace("SCIM2").build());
+    Set<String> added = new HashSet<>();
+    added.add(composeComplexType(idThomasJefferson, "User", null, null));
+    added.add(composeComplexType(idJeffersonDavis, "User", null, null));
+    AttributeDeltaBuilder builder;
+    builder = new AttributeDeltaBuilder().setName(Scim2GroupAttribute.members.name()).addValueToAdd(added);
+    delta.add(builder.build());
+    Set<String> removed = new HashSet<>();
+    removed.add(composeComplexType(idGeorgeWashington, "User", null, null));
+    builder = new AttributeDeltaBuilder().setName(Scim2GroupAttribute.members.name()).addValueToRemove(removed);
+    delta.add(builder.build());
     Set<AttributeDelta> output = getConnectorFacade().updateDelta(objGroup, uid, delta, options);
     assertNotNull(output);
   }
