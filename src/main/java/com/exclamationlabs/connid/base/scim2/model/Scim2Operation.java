@@ -9,15 +9,12 @@ public class Scim2Operation
 {
     @SerializedName("op")
     private String operation;
+    private String path;
+    private List<Map<String, String>> value;
 
     public String getOperation()
     {
         return operation;
-    }
-
-    public void setOperation(String operation)
-    {
-        this.operation = operation;
     }
 
     public String getPath()
@@ -25,21 +22,23 @@ public class Scim2Operation
         return path;
     }
 
-    public void setPath(String path)
-    {
-        this.path = path;
-    }
-
     public List<Map<String, String>> getValue()
     {
         return value;
+    }
+
+    public void setOperation(String operation)
+    {
+        this.operation = operation;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
     }
 
     public void setValue(List<Map<String, String>> value)
     {
         this.value = value;
     }
-
-    private String path;
-    private List<Map<String, String>> value;
 }
