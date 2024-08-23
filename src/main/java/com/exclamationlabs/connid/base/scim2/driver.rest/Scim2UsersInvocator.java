@@ -8,20 +8,40 @@ import com.exclamationlabs.connid.base.connector.results.ResultsFilter;
 import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.driver.rest.slack.Scim2SlackUsersInvocator;
-import com.exclamationlabs.connid.base.scim2.model.Scim2User;
+import com.exclamationlabs.connid.base.scim2.model.*;
 import com.exclamationlabs.connid.base.scim2.model.response.ListUsersResponse;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2User>
 {
     private static final Log LOG = Log.getLog(Scim2UsersInvocator.class);
+
+    public static List<Scim2Operation> addOperations(String name, List<Map<String, String>> add, List<Map<String, String>> remove) {
+        List<Scim2Operation> operations = new ArrayList<>();
+        if (remove != null && !remove.isEmpty())
+        {
+            for (Map<String, String> item: remove)
+            {
+                Scim2Operation op = new Scim2Operation();
+                op.setOperation("remove");
+                String path = String.format("%s[value eq \"%s\"]", name, item.get("value"));
+                op.setPath(path);
+                operations.add(op);
+            }
+        }
+        if ( add != null && !add.isEmpty() ) {
+            Scim2Operation addOperation = new Scim2Operation();
+            addOperation.setOperation("add");
+            addOperation.setPath(name);
+            addOperation.setValue(new ArrayList<>(add));
+            operations.add(addOperation);
+        }
+        return operations;
+    }
     @Override
     public String create(Scim2Driver driver, Scim2User user) throws ConnectorException
     {
@@ -119,68 +139,6 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
         return parameter;
     }
 
-    /**
-     * @param paginator
-     * @return SCIM2 Pagination parameters or null when pagination is not specified
-     */
-    public static String getPagingParameter(ResultsPaginator paginator)
-    {
-        String parameter = null;
-        if ( paginator != null )
-        {
-            if ( paginator.hasPagination() )
-            {
-                Integer count = paginator.getPageSize();
-                parameter = "count=" + count;
-            }
-            if ( paginator.getCurrentOffset() != null ) {
-                Integer startIndex = paginator.getCurrentOffset();
-                String start = "startIndex=" + startIndex;
-                parameter = (parameter == null) ? start : parameter + "&" + start  ;
-            }
-            else if ( paginator.getCurrentPageNumber() != null )
-            {
-                Integer startIndex = ((paginator.getCurrentPageNumber()-1) * paginator.getPageSize()) + 1;
-                String start = "startIndex=" + startIndex;
-                parameter = (parameter == null) ? start : parameter + "&" + start  ;
-            }
-        }
-        else {
-            parameter = "";
-        }
-        return parameter;
-    }
-    public static void updatePaginator(ResultsPaginator paginator, int totalReturned, int totalResults, int pageSize){
-        paginator.setTotalResults(totalResults);
-        if (pageSize < paginator.getPageSize())
-        {
-            // override the number of items returned in the page
-            pageSize = paginator.getPageSize();
-        }
-        Integer pages = totalResults / pageSize;
-        if ( (totalResults % pageSize) > 0 )
-        {
-            pages++;
-        }
-        paginator.setNumberOfTotalPages( pages);
-        if (paginator.getNumberOfProcessedResults() == null) {
-            paginator.setNumberOfProcessedResults(0);
-        }
-        paginator.setNumberOfProcessedResults(paginator.getNumberOfProcessedResults() + totalReturned);
-        if ( paginator.getNumberOfProcessedPages() == null )
-        {
-            paginator.setNumberOfProcessedPages(0);
-        }
-        paginator.setNumberOfProcessedPages(paginator.getNumberOfProcessedPages()+1);
-        if ( paginator.getTotalResults() == paginator.getNumberOfProcessedResults() ) {
-            paginator.setNoMoreResults(true);
-        }
-        if ( totalReturned == 0 )
-        {
-            paginator.setNoMoreResults(true);
-        }
-    }
-
     @Override
     public Scim2User getOne(Scim2Driver driver, String objectId, Map<String, Object> prefetchDataMap)
             throws ConnectorException
@@ -250,6 +208,38 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
         return user;
     }
 
+    /**
+     * @param paginator
+     * @return SCIM2 Pagination parameters or null when pagination is not specified
+     */
+    public static String getPagingParameter(ResultsPaginator paginator)
+    {
+        String parameter = null;
+        if ( paginator != null )
+        {
+            if ( paginator.hasPagination() )
+            {
+                Integer count = paginator.getPageSize();
+                parameter = "count=" + count;
+            }
+            if ( paginator.getCurrentOffset() != null ) {
+                Integer startIndex = paginator.getCurrentOffset();
+                String start = "startIndex=" + startIndex;
+                parameter = (parameter == null) ? start : parameter + "&" + start  ;
+            }
+            else if ( paginator.getCurrentPageNumber() != null )
+            {
+                Integer startIndex = ((paginator.getCurrentPageNumber()-1) * paginator.getPageSize()) + 1;
+                String start = "startIndex=" + startIndex;
+                parameter = (parameter == null) ? start : parameter + "&" + start  ;
+            }
+        }
+        else {
+            parameter = "";
+        }
+        return parameter;
+    }
+
     @Override
     public Map<String, Object> getPrefetch(Scim2Driver driver)
     {
@@ -274,10 +264,76 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
                     .build();
             RestResponseData<Scim2User> response = driver.executeRequest(req);
             Scim2User updated = response.getResponseObject();
+            updateMultiValued(driver, userId, user);
         }
         else if (config.getEnableDynamicSchema())
         {
             ;
+        }
+    }
+
+    public void updateMultiValued(Scim2Driver driver, String userId, Scim2User user)
+        throws ConnectorException {
+
+        boolean hasWork = false;
+        Scim2Configuration config = driver.getConfiguration();
+        String url = driver.getConfiguration().getUsersEndpointUrl() + "/" + userId;
+        Scim2PatchOp patchOp = new Scim2PatchOp();
+        patchOp.setOperations(new ArrayList<>());
+        List<Scim2Operation> operations = new ArrayList<>();
+        operations.addAll(addOperations("addresses", user.getAddressesAdded(), user.getAddressesRemoved()));
+        operations.addAll(addOperations("emails", user.getEmailsAdded(), user.getEmailsRemoved()));
+        operations.addAll(addOperations("entitlements", user.getEntitlementsAdded(), user.getEntitlementsRemoved()));
+        operations.addAll(addOperations("groups", user.getGroupsAdded(), user.getGroupsRemoved()));
+        operations.addAll(addOperations("ims", user.getImsAdded(), user.getImsRemoved()));
+        operations.addAll(addOperations("phoneNumbers", user.getPhoneNumbersAdded(), user.getPhoneNumbersRemoved()));
+        operations.addAll(addOperations("photos", user.getPhotosAdded(), user.getPhotosRemoved()));
+        operations.addAll(addOperations("roles", user.getRolesAdded(), user.getRolesRemoved()));
+        operations.addAll(addOperations("x509Certificates", user.getX509CertificatesAdded(), user.getX509CertificatesRemoved()));
+        patchOp.setOperations(operations);
+        if (!operations.isEmpty())
+        {
+            RestRequest request =
+                    new RestRequest.Builder<>(Scim2User.class)
+                            .withPatch()
+                            .withRequestUri(url)
+                            .withRequestBody(patchOp)
+                            .build();
+            RestResponseData<Scim2User> data = driver.executeRequest(request);
+            if (data.getResponseStatusCode() != 200 && data.getResponseStatusCode() != 204)
+            {
+                LOG.warn(String.format("SCIM2 Update User returned HTTP status %s", Integer.toString(data.getResponseStatusCode())));
+            }
+        }
+    }
+    public static void updatePaginator(ResultsPaginator paginator, int totalReturned, int totalResults, int pageSize){
+        paginator.setTotalResults(totalResults);
+        if (pageSize < paginator.getPageSize())
+        {
+            // override the number of items returned in the page
+            pageSize = paginator.getPageSize();
+        }
+        Integer pages = totalResults / pageSize;
+        if ( (totalResults % pageSize) > 0 )
+        {
+            pages++;
+        }
+        paginator.setNumberOfTotalPages( pages);
+        if (paginator.getNumberOfProcessedResults() == null) {
+            paginator.setNumberOfProcessedResults(0);
+        }
+        paginator.setNumberOfProcessedResults(paginator.getNumberOfProcessedResults() + totalReturned);
+        if ( paginator.getNumberOfProcessedPages() == null )
+        {
+            paginator.setNumberOfProcessedPages(0);
+        }
+        paginator.setNumberOfProcessedPages(paginator.getNumberOfProcessedPages()+1);
+        if ( paginator.getTotalResults() == paginator.getNumberOfProcessedResults() ) {
+            paginator.setNoMoreResults(true);
+        }
+        if ( totalReturned == 0 )
+        {
+            paginator.setNoMoreResults(true);
         }
     }
 }

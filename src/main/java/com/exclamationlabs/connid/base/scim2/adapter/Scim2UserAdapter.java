@@ -62,11 +62,11 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     result.add(new ConnectorAttribute(OperationalAttributes.ENABLE_NAME,active.name(), BOOLEAN));
     result.add(new ConnectorAttribute(OperationalAttributes.PASSWORD_NAME,password.name(), GUARDED_STRING, NOT_READABLE, NOT_RETURNED_BY_DEFAULT));
     result.add(new ConnectorAttribute(addresses.name(), STRING, MULTIVALUED));
-    result.add(new ConnectorAttribute(emails.name(), STRING, MULTIVALUED));
+    result.add(new ConnectorAttribute(emails.name(), STRING, MULTIVALUED, REQUIRED));
     result.add(new ConnectorAttribute(phoneNumbers.name(), STRING, MULTIVALUED));
     result.add(new ConnectorAttribute(ims.name(), STRING, MULTIVALUED));
     result.add(new ConnectorAttribute(photos.name(), STRING, MULTIVALUED));
-    result.add(new ConnectorAttribute(groups.name(), STRING, MULTIVALUED));
+    result.add(new ConnectorAttribute(groups.name(), STRING, MULTIVALUED, NOT_UPDATEABLE, NOT_CREATABLE));
     result.add(new ConnectorAttribute(entitlements.name(), STRING, MULTIVALUED));
     result.add(new ConnectorAttribute(roles.name(), STRING, MULTIVALUED));
     result.add(new ConnectorAttribute(x509Certificates.name(), STRING, MULTIVALUED));
@@ -147,6 +147,52 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     return list;
   }
 
+  /**
+   * Converts a Set of JSON formatted Strings into a list of Map
+   * @param json
+   * @return List of Map containing name value pairs.
+   */
+  public List<Map<String, String>> getListOfMapFromJSON(Set<String> json)
+  {
+    List<Map<String, String>> list = null;
+    if ( json != null && !json.isEmpty() ) {
+      list = new ArrayList<>();
+      for (String item : json) {
+        Map<String, String> map = new HashMap<>();
+        Gson gson = new Gson();
+        Map<String, Object> mapObject = gson.fromJson(item, Map.class);
+        for (Map.Entry<String, Object> entry : mapObject.entrySet()) {
+          map.put(entry.getKey(), entry.getValue().toString());
+        }
+        list.add(map);
+      }
+    }
+    return list;
+  }
+
+  /**
+   * Construct a Set of JSON formatted strings
+   * from of list of maps containing name values pairs
+   * @param list List of maps
+   * @return Set of JSON formatted strings
+   */
+  public Set<String> getSetOfJSONFromListOfMap(List<Map<String, String>> list){
+    Set<String> set = null;
+    if ( list != null && list.size() > 0 )
+    {
+      String json = null;
+      set = new HashSet<>();
+      for(Map<String, String> item: list) {
+        StringJoiner joiner = new StringJoiner(",", "{", "}");
+        item.forEach((key, value) -> {
+          joiner.add(String.format("\"%s\":\"%s\"", key, value));
+        });
+        json = joiner.toString();
+        set.add(json);
+      }
+    }
+    return set;
+  }
   /**
    * Convert Collection of SCIM2 Complex Type to Set of JSON Strings
    * @param complexTypes Collection of complex types to be converted
@@ -402,7 +448,7 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
       attributes.add(AttributeBuilder.build(entitlements.name(), entitlementsSet));
     }
 
-    Set<String> groupSet = putGroups(user.getGroups());
+    Set<String> groupSet = getSetOfJSONFromListOfMap(user.getGroups());
     if ( groupSet != null )
     {
       attributes.add(AttributeBuilder.build(groups.name(), groupSet));
@@ -548,38 +594,74 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     // Populate Addresses
     Set<String> addressList = readAssignments(attributes, addresses);
     user.setAddresses(getAddresses(addressList));
-
+    addressList = readAssignments(addedMultiValueAttributes, addresses);
+    user.setAddressesAdded(getListOfMapFromJSON(addressList));
+    addressList = readAssignments(removedMultiValueAttributes, addresses);
+    user.setAddressesRemoved(getListOfMapFromJSON(addressList));
     // Populate emails
     Set<String> emailList = readAssignments(attributes, emails);
     user.setEmails(getComplexTypes(emailList));
+    emailList = readAssignments(addedMultiValueAttributes, emails);
+    user.setEmailsAdded(getListOfMapFromJSON(emailList));
+    emailList = readAssignments(removedMultiValueAttributes, emails);
+    user.setEmailsRemoved(getListOfMapFromJSON(emailList));
 
     // Populate Entitlements
     Set<String> entitlementsList = readAssignments(attributes, entitlements);
     user.setEntitlements(getComplexTypes(entitlementsList));
+    entitlementsList = readAssignments(addedMultiValueAttributes, entitlements);
+    user.setEntitlementsAdded(getListOfMapFromJSON(entitlementsList));
+    entitlementsList = readAssignments(removedMultiValueAttributes, entitlements);
+    user.setEntitlementsRemoved(getListOfMapFromJSON(entitlementsList));
 
     // Populate instant Messages ims
     Set<String> imList = readAssignments(attributes, ims);
     user.setIms(getComplexTypes(imList));
+    imList = readAssignments(addedMultiValueAttributes, ims);
+    user.setImsAdded(getListOfMapFromJSON(imList));
+    imList = readAssignments(removedMultiValueAttributes, ims);
+    user.setImsRemoved(getListOfMapFromJSON(imList));
 
     // Populate Phone Numbers
     Set<String> phoneNumberList = readAssignments(attributes, phoneNumbers);
     user.setPhoneNumbers(getComplexTypes(phoneNumberList));
+    phoneNumberList = readAssignments(addedMultiValueAttributes, phoneNumbers);
+    user.setPhoneNumbersAdded(getListOfMapFromJSON(phoneNumberList));
+    phoneNumberList = readAssignments(removedMultiValueAttributes, phoneNumbers);
+    user.setPhoneNumbersRemoved(getListOfMapFromJSON(phoneNumberList));
 
     // Populate Photos
     Set<String> photoList = readAssignments(attributes, photos);
     user.setPhotos(getComplexTypes(photoList));
+    photoList = readAssignments(addedMultiValueAttributes, photos);
+    user.setPhotosAdded(getListOfMapFromJSON(photoList));
+    photoList = readAssignments(removedMultiValueAttributes, photos);
+    user.setPhotosRemoved(getListOfMapFromJSON(photoList));
 
     // Populate roles
     Set<String> roleList = readAssignments(attributes, roles);
     user.setRoles(getComplexTypes(roleList));
+    roleList = readAssignments(addedMultiValueAttributes, roles);
+    user.setRolesAdded(getListOfMapFromJSON(roleList));
+    roleList = readAssignments(removedMultiValueAttributes, roles);
+    user.setRolesRemoved(getListOfMapFromJSON(roleList));
 
     // Populate x509Certificates
     Set<String> x509CertificateList = readAssignments(attributes, x509Certificates);
     user.setX509Certificates(getComplexTypes(x509CertificateList));
+    x509CertificateList = readAssignments(addedMultiValueAttributes, x509Certificates);
+    user.setX509CertificatesAdded(getListOfMapFromJSON(x509CertificateList));
+    x509CertificateList = readAssignments(removedMultiValueAttributes, x509Certificates);
+    user.setX509CertificatesRemoved(getListOfMapFromJSON(x509CertificateList));
 
     // Populate Groups
     Set<String> groupList = readAssignments(attributes, groups);
-    user.setGroups(getGroupTypes(groupList));
+    user.setGroups(getListOfMapFromJSON(groupList));
+    groupList = readAssignments(addedMultiValueAttributes, groups);
+    user.setGroupsAdded(getListOfMapFromJSON(groupList));
+    groupList = readAssignments(removedMultiValueAttributes, groups);
+    user.setGroupsRemoved(getListOfMapFromJSON(groupList));
+
     // Set Schemas
     if ( user.getSchemas() == null || user.getSchemas().isEmpty()) {
       List<String> schemaList = new ArrayList<>();

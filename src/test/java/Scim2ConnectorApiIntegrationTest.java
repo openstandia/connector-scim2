@@ -3,6 +3,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.exclamationlabs.connid.base.connector.configuration.ConfigurationReader;
 import com.exclamationlabs.connid.base.connector.test.ApiIntegrationTest;
 import com.exclamationlabs.connid.base.scim2.Scim2Connector;
+import com.exclamationlabs.connid.base.scim2.attribute.Scim2GroupAttribute;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 
 import java.util.HashSet;
@@ -103,7 +104,7 @@ public class Scim2ConnectorApiIntegrationTest
     attributes.add(new AttributeBuilder().setName("title").addValue("President").build());
     attributes.add(new AttributeBuilder().setName("timezone").addValue("America/New_York").build());
     attributes.add(new AttributeBuilder().setName("userType").addValue("Employee").build());
-    attributes.add(new AttributeBuilder().setName("userType").addValue("multi").build());
+    attributes.add(new AttributeBuilder().setName("guest_type").addValue("multi").build());
 
     Set<String> phones = new HashSet<>();
     phones.add(composeComplexType("954-555-1776", "work", null, true));
@@ -137,14 +138,20 @@ public class Scim2ConnectorApiIntegrationTest
     Uid uid = new Uid(idThomasJefferson);
     Set<AttributeDelta> delta = new HashSet<>();
     delta.add(new AttributeDeltaBuilder().setName("userName").addValueToReplace("tjefferson").build());
+    delta.add(new AttributeDeltaBuilder().setName("name_honorificPrefix").addValueToReplace("General").build());
     Set<String> emails = new HashSet<>();
     emails.add(composeComplexType("services-dev+tjwork@provisioniam.com", "work", null, true));
-    emails.add(composeComplexType("services-dev+tjhome@provisioniam.com", "home", null, null));
+    // emails.add(composeComplexType("services-dev+tjhome@provisioniam.com", "home", null, null));
     delta.add(new AttributeDeltaBuilder().setName("emails").addValueToReplace(emails).build());
     Set<String> phones = new HashSet<>();
     phones.add(composeComplexType("954-555-1776", "work", null, true));
     phones.add(composeComplexType("954-555-1800", "mobile", null, false));
     delta.add(new AttributeDeltaBuilder().setName("phoneNumbers").addValueToReplace(phones).build());
+    // Groups are Read Only
+    Set<String> groups = new HashSet<>();
+    groups.add(composeComplexType("S07H5SNR7U5", null, "Test Group", null));
+    delta.add(new AttributeDeltaBuilder().setName("groups").addValueToAdd(groups).build());
+
     delta.add(new AttributeDeltaBuilder().setName(OperationalAttributes.ENABLE_NAME).addValueToReplace(true).build());
     delta.add(new AttributeDeltaBuilder().setName("employeeNumber").addValueToReplace("51234").build());
     delta.add(new AttributeDeltaBuilder().setName("costCenter").addValueToReplace("Research").build());
@@ -292,7 +299,16 @@ public class Scim2ConnectorApiIntegrationTest
     OperationOptions options = new OperationOptionsBuilder().build();
     Uid uid = new Uid(idScim2Group);
     Set<AttributeDelta> delta = new HashSet<>();
-    delta.add(new AttributeDeltaBuilder().setName(Name.NAME).addValueToReplace("SCIM2").build());
+    Set<String> added = new HashSet<>();
+    added.add(composeComplexType(idThomasJefferson, "User", null, null));
+    added.add(composeComplexType(idJeffersonDavis, "User", null, null));
+    AttributeDeltaBuilder builder;
+    builder = new AttributeDeltaBuilder().setName(Scim2GroupAttribute.members.name()).addValueToAdd(added);
+    delta.add(builder.build());
+    Set<String> removed = new HashSet<>();
+    removed.add(composeComplexType(idGeorgeWashington, "User", null, null));
+    builder = new AttributeDeltaBuilder().setName(Scim2GroupAttribute.members.name()).addValueToRemove(removed);
+    delta.add(builder.build());
     Set<AttributeDelta> output = getConnectorFacade().updateDelta(objGroup, uid, delta, options);
     assertNotNull(output);
   }

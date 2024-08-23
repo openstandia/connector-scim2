@@ -136,6 +136,13 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
 
     Set<String> jsonMembers = readAssignments(attributes, members);
     group.setMembers(getMembersFromJSON(jsonMembers));
+    // Removed these members
+    jsonMembers = readAssignments(removedMultiValueAttributes, members);
+    group.setRemoveMembers(getMembersFromJSON(jsonMembers));
+    // Add these members
+    jsonMembers = readAssignments(addedMultiValueAttributes, members);
+    group.setAddMembers(getMembersFromJSON(jsonMembers));
+    // Set the schema List to groups
     Set<String> schemaList = new HashSet<>();
     schemaList.add(SCIM2_CORE_GROUP_SCHEMA);
     group.setSchemas(schemaList);
