@@ -8,6 +8,9 @@ import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2Driver;
 import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2UsersInvocator;
+import com.exclamationlabs.connid.base.scim2.model.Scim2Operation;
+import com.exclamationlabs.connid.base.scim2.model.Scim2PatchOp;
+import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.exclamationlabs.connid.base.scim2.model.response.ListSlackUsersResponse;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import java.util.*;
@@ -40,16 +43,25 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
   }
 
   @Override
-  public void update(Scim2Driver driver, String userId, Scim2SlackUser userModel)
+  public void update(Scim2Driver driver, String userId, Scim2SlackUser model)
       throws ConnectorException {
 
-    RestRequest req = new RestRequest.Builder<>(Scim2SlackUser.class)
-            .withPut()
-            .withRequestUri(driver.getConfiguration().getUsersEndpointUrl() + "/" + userId)
-            .withRequestBody(userModel)
-            .build();
-    RestResponseData<Scim2SlackUser> response = driver.executeRequest(req);
-    Scim2SlackUser updated = response.getResponseObject();
+    // verify required fields
+    if ( model != null
+            && model.getUserName() != null
+            && model.getUserName().length() > 0
+            && model.getEmails() != null
+            && model.getEmails().size() > 0 )
+    {
+      RestRequest req = new RestRequest.Builder<>(Scim2SlackUser.class)
+              .withPut()
+              .withRequestUri(driver.getConfiguration().getUsersEndpointUrl() + "/" + userId)
+              .withRequestBody(model)
+              .build();
+      RestResponseData<Scim2SlackUser> response = driver.executeRequest(req);
+      Scim2SlackUser updated = response.getResponseObject();
+    }
+    updateMultiValued(driver, userId, model);
   }
 
   @Override
@@ -177,4 +189,36 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
     allUsers = getUsersList(driver, filter, paginator);
     return allUsers;
   }
+  public void updateMultiValued(Scim2Driver driver, String userId, Scim2SlackUser user)
+          throws ConnectorException {
+
+    boolean hasWork = false;
+    Scim2Configuration config = driver.getConfiguration();
+    String url = driver.getConfiguration().getUsersEndpointUrl() + "/" + userId;
+    Scim2PatchOp patchOp = new Scim2PatchOp();
+    patchOp.setOperations(new ArrayList<>());
+    List<Scim2Operation> operations = new ArrayList<>();
+    operations.addAll(Scim2UsersInvocator.addOperations("addresses", user.getAddressesAdded(), user.getAddressesRemoved()));
+    operations.addAll(Scim2UsersInvocator.addOperations("emails", user.getEmailsAdded(), user.getEmailsRemoved()));
+    operations.addAll(Scim2UsersInvocator.addOperations("groups", user.getGroupsAdded(), user.getGroupsRemoved()));
+    operations.addAll(Scim2UsersInvocator.addOperations("phoneNumbers", user.getPhoneNumbersAdded(), user.getPhoneNumbersRemoved()));
+    operations.addAll(Scim2UsersInvocator.addOperations("photos", user.getPhotosAdded(), user.getPhotosRemoved()));
+    operations.addAll(Scim2UsersInvocator.addOperations("roles", user.getRolesAdded(), user.getRolesRemoved()));
+    patchOp.setOperations(operations);
+    if (!operations.isEmpty())
+    {
+      RestRequest request =
+              new RestRequest.Builder<>(Scim2User.class)
+                      .withPatch()
+                      .withRequestUri(url)
+                      .withRequestBody(patchOp)
+                      .build();
+      RestResponseData<Scim2User> data = driver.executeRequest(request);
+      if (data.getResponseStatusCode() != 200 && data.getResponseStatusCode() != 204)
+      {
+        LOG.warn(String.format("SCIM2 Update User returned HTTP status %s", Integer.toString(data.getResponseStatusCode())));
+      }
+    }
+  }
+
 }

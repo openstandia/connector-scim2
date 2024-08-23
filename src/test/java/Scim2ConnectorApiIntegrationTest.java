@@ -104,7 +104,7 @@ public class Scim2ConnectorApiIntegrationTest
     attributes.add(new AttributeBuilder().setName("title").addValue("President").build());
     attributes.add(new AttributeBuilder().setName("timezone").addValue("America/New_York").build());
     attributes.add(new AttributeBuilder().setName("userType").addValue("Employee").build());
-    attributes.add(new AttributeBuilder().setName("userType").addValue("multi").build());
+    attributes.add(new AttributeBuilder().setName("guest_type").addValue("multi").build());
 
     Set<String> phones = new HashSet<>();
     phones.add(composeComplexType("954-555-1776", "work", null, true));
@@ -138,14 +138,20 @@ public class Scim2ConnectorApiIntegrationTest
     Uid uid = new Uid(idThomasJefferson);
     Set<AttributeDelta> delta = new HashSet<>();
     delta.add(new AttributeDeltaBuilder().setName("userName").addValueToReplace("tjefferson").build());
+    delta.add(new AttributeDeltaBuilder().setName("name_honorificPrefix").addValueToReplace("General").build());
     Set<String> emails = new HashSet<>();
     emails.add(composeComplexType("services-dev+tjwork@provisioniam.com", "work", null, true));
-    emails.add(composeComplexType("services-dev+tjhome@provisioniam.com", "home", null, null));
+    // emails.add(composeComplexType("services-dev+tjhome@provisioniam.com", "home", null, null));
     delta.add(new AttributeDeltaBuilder().setName("emails").addValueToReplace(emails).build());
     Set<String> phones = new HashSet<>();
     phones.add(composeComplexType("954-555-1776", "work", null, true));
     phones.add(composeComplexType("954-555-1800", "mobile", null, false));
     delta.add(new AttributeDeltaBuilder().setName("phoneNumbers").addValueToReplace(phones).build());
+    // Groups are Read Only
+    Set<String> groups = new HashSet<>();
+    groups.add(composeComplexType("S07H5SNR7U5", null, "Test Group", null));
+    delta.add(new AttributeDeltaBuilder().setName("groups").addValueToAdd(groups).build());
+
     delta.add(new AttributeDeltaBuilder().setName(OperationalAttributes.ENABLE_NAME).addValueToReplace(true).build());
     delta.add(new AttributeDeltaBuilder().setName("employeeNumber").addValueToReplace("51234").build());
     delta.add(new AttributeDeltaBuilder().setName("costCenter").addValueToReplace("Research").build());
