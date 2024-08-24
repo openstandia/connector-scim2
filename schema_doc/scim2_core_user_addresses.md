@@ -1,5 +1,5 @@
-<table border=1>
-	<thead>
+<table style="border: 1px black;">
+	<thead style="border: 1px black;">
 		<tr>
 			<th>name</th>
 			<th>type</th>
@@ -12,12 +12,12 @@
 			<th>uniqueness</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody style="vertical-align: top">
 		<tr>
 			<td>formatted</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The full name, including all middle names, titles, and suffixes as appropriate, formatted for display (e.g., 'Ms. Barbara J Jensen, III').</td>
+			<td>The full mailing address, formatted for display or use with a mailing label.  This attribute MAY contain newlines.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -25,10 +25,10 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>familyName</td>
+			<td>streetAddress</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The family name of the User, or last name in most Western languages (e.g., 'Jensen' given the full name 'Ms. Barbara J Jensen, III').</td>
+			<td>The full street address component, which may include house number, street name, P.O. box, and multi-line extended street address information.  This attribute MAY contain newlines.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -36,10 +36,10 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>givenName</td>
+			<td>locality</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The given name of the User, or first name in most Western languages (e.g., 'Barbara' given the full name 'Ms. Barbara J Jensen, III').</td>
+			<td>The city or locality component.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -47,10 +47,10 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>middleName</td>
+			<td>region</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The middle name(s) of the User (e.g., 'Jane' given the full name 'Ms. Barbara J Jensen, III').</td>
+			<td>The state or region component.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -58,10 +58,10 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>honorificPrefix</td>
+			<td>postalCode</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The honorific prefix(es) of the User, or title in most Western languages (e.g., 'Ms.' given the full name 'Ms. Barbara J Jensen, III').</td>
+			<td>The zip code or postal code component.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -69,10 +69,21 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>honorificSuffix</td>
+			<td>country</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The honorific suffix(es) of the User, or suffix in most Western languages (e.g., 'III' given the full name 'Ms. Barbara J Jensen, III').</td>
+			<td>The country name component.</td>
+			<td>false</td>
+			<td>false</td>
+			<td>readWrite</td>
+			<td>default</td>
+			<td>none</td>
+		</tr>
+		<tr>
+			<td>type</td>
+			<td>string</td>
+			<td>false</td>
+			<td>A label indicating the attribute's function, e.g., 'work' or 'home'.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>

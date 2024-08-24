@@ -1,5 +1,5 @@
-<table border=1>
-	<thead>
+<table style="border: 1px black;">
+	<thead style="border: 1px black;">
 		<tr>
 			<th>name</th>
 			<th>type</th>
@@ -12,12 +12,12 @@
 			<th>uniqueness</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody style="vertical-align: top">
 		<tr>
 			<td>value</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The value of an entitlement.</td>
+			<td>The value of a role.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>

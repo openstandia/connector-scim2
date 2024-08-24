@@ -83,13 +83,12 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
     return result;
   }
 
-
   @Override
   protected Set<Attribute> constructAttributes(Scim2Group group)
   {
     Set<Attribute> attributes = new HashSet<>();
     Set<String> memberSet = new HashSet<>();
-    attributes.add(AttributeBuilder.build(displayName.name(), group.getDisplayName()));
+    //attributes.add(AttributeBuilder.build(displayName.name(), group.getDisplayName()));
     attributes.add(AttributeBuilder.build(Name.NAME, group.getIdentityNameValue()));
     attributes.add(AttributeBuilder.build(id.name(), group.getId()));
     attributes.add(AttributeBuilder.build(Uid.NAME, group.getIdentityIdValue()));

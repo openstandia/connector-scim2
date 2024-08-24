@@ -1,5 +1,5 @@
-<table border=1>
-	<thead>
+<table style="border: 1px black;">
+	<thead style="border: 1px black;">
 		<tr>
 			<th>name</th>
 			<th>type</th>
@@ -12,12 +12,12 @@
 			<th>uniqueness</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody style="vertical-align: top">
 		<tr>
 			<td>value</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The value of a role.</td>
+			<td>Phone number of the User.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -39,7 +39,7 @@
 			<td>type</td>
 			<td>string</td>
 			<td>false</td>
-			<td>A label indicating the attribute's function.</td>
+			<td>A label indicating the attribute's function, e.g., 'work', 'home', 'mobile'.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -50,7 +50,7 @@
 			<td>primary</td>
 			<td>boolean</td>
 			<td>false</td>
-			<td>A Boolean value indicating the 'primary' or preferred attribute value for this attribute.  The primary attribute value 'true' MUST appear no more than once.</td>
+			<td>A Boolean value indicating the 'primary' or preferred attribute value for this attribute, e.g., the preferred phone number or primary phone number.  The primary attribute value 'true' MUST appear no more than once.</td>
 			<td>false</td>
 			<td></td>
 			<td>readWrite</td>

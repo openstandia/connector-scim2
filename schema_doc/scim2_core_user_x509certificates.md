@@ -1,5 +1,5 @@
-<table border=1>
-	<thead>
+<table style="border: 1px black;">
+	<thead style="border: 1px black;">
 		<tr>
 			<th>name</th>
 			<th>type</th>
@@ -12,23 +12,12 @@
 			<th>uniqueness</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody style="vertical-align: top">
 		<tr>
 			<td>value</td>
-			<td>string</td>
+			<td>binary</td>
 			<td>false</td>
-			<td>The id of the SCIM resource representing the User's manager.  REQUIRED.</td>
-			<td>false</td>
-			<td>false</td>
-			<td>readWrite</td>
-			<td>default</td>
-			<td>none</td>
-		</tr>
-		<tr>
-			<td>$ref</td>
-			<td>reference</td>
-			<td>false</td>
-			<td>The URI of the SCIM resource representing the User's manager.  REQUIRED.</td>
+			<td>The value of an X.509 certificate.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -36,15 +25,37 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>displayName</td>
+			<td>display</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The displayName of the User's manager. OPTIONAL and READ-ONLY.</td>
+			<td>A human-readable name, primarily used for display purposes.  READ-ONLY.</td>
 			<td>false</td>
 			<td>false</td>
-			<td>readOnly</td>
+			<td>readWrite</td>
 			<td>default</td>
 			<td>none</td>
+		</tr>
+		<tr>
+			<td>type</td>
+			<td>string</td>
+			<td>false</td>
+			<td>A label indicating the attribute's function.</td>
+			<td>false</td>
+			<td>false</td>
+			<td>readWrite</td>
+			<td>default</td>
+			<td>none</td>
+		</tr>
+		<tr>
+			<td>primary</td>
+			<td>boolean</td>
+			<td>false</td>
+			<td>A Boolean value indicating the 'primary' or preferred attribute value for this attribute.  The primary attribute value 'true' MUST appear no more than once.</td>
+			<td>false</td>
+			<td></td>
+			<td>readWrite</td>
+			<td>default</td>
+			<td></td>
 		</tr>
 		<tr>
 			<td></td>

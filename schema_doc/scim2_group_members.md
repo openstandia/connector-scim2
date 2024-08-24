@@ -1,5 +1,5 @@
-<table border=1>
-	<thead>
+<table style="border: 1px black;">
+	<thead style="text-align: left">
 		<tr>
 			<th>name</th>
 			<th>type</th>
@@ -12,26 +12,26 @@
 			<th>uniqueness</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody  style="vertical-align: top">
 		<tr>
 			<td>value</td>
-			<td>binary</td>
+			<td>string</td>
 			<td>false</td>
-			<td>The value of an X.509 certificate.</td>
+			<td>Identifier of the member of this Group.</td>
 			<td>false</td>
 			<td>false</td>
-			<td>readWrite</td>
+			<td>immutable</td>
 			<td>default</td>
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>display</td>
-			<td>string</td>
+			<td>$ref</td>
+			<td>reference</td>
 			<td>false</td>
-			<td>A human-readable name, primarily used for display purposes.  READ-ONLY.</td>
+			<td>The URI corresponding to a SCIM resource that is a member of this Group.</td>
 			<td>false</td>
 			<td>false</td>
-			<td>readWrite</td>
+			<td>immutable</td>
 			<td>default</td>
 			<td>none</td>
 		</tr>
@@ -39,23 +39,12 @@
 			<td>type</td>
 			<td>string</td>
 			<td>false</td>
-			<td>A label indicating the attribute's function.</td>
+			<td>A label indicating the type of resource, e.g., 'User' or 'Group'.</td>
 			<td>false</td>
 			<td>false</td>
-			<td>readWrite</td>
+			<td>immutable</td>
 			<td>default</td>
 			<td>none</td>
-		</tr>
-		<tr>
-			<td>primary</td>
-			<td>boolean</td>
-			<td>false</td>
-			<td>A Boolean value indicating the 'primary' or preferred attribute value for this attribute.  The primary attribute value 'true' MUST appear no more than once.</td>
-			<td>false</td>
-			<td></td>
-			<td>readWrite</td>
-			<td>default</td>
-			<td></td>
 		</tr>
 		<tr>
 			<td></td>

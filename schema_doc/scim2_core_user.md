@@ -1,5 +1,5 @@
-<table border=1>
-	<thead>
+<table style="border: 1px black;">
+	<thead style="border: 1px black;">
 		<tr>
 			<th>name</th>
 			<th>type</th>
@@ -12,7 +12,7 @@
 			<th>uniqueness</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody style="vertical-align: top">
 		<tr>
 			<td>userName</td>
 			<td>string</td>

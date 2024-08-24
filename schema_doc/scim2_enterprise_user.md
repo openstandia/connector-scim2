@@ -1,5 +1,5 @@
-<table border=1>
-	<thead>
+<table style="border: 1px black;">
+	<thead style="border: 1px black;">
 		<tr>
 			<th>name</th>
 			<th>type</th>
@@ -12,12 +12,12 @@
 			<th>uniqueness</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody style="vertical-align: top">
 		<tr>
-			<td>formatted</td>
+			<td>employeeNumber</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The full mailing address, formatted for display or use with a mailing label.  This attribute MAY contain newlines.</td>
+			<td>Numeric or alphanumeric identifier assigned to a person, typically based on order of hire or association with an organization.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -25,10 +25,10 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>streetAddress</td>
+			<td>costCenter</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The full street address component, which may include house number, street name, P.O. box, and multi-line extended street address information.  This attribute MAY contain newlines.</td>
+			<td>Identifies the name of a cost center.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -36,10 +36,10 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>locality</td>
+			<td>organization</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The city or locality component.</td>
+			<td>Identifies the name of an organization.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -47,10 +47,10 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>region</td>
+			<td>division</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The state or region component.</td>
+			<td>Identifies the name of a division.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -58,10 +58,10 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>postalCode</td>
+			<td>department</td>
 			<td>string</td>
 			<td>false</td>
-			<td>The zip code or postal code component.</td>
+			<td>Identifies the name of a department.</td>
 			<td>false</td>
 			<td>false</td>
 			<td>readWrite</td>
@@ -69,26 +69,15 @@
 			<td>none</td>
 		</tr>
 		<tr>
-			<td>country</td>
-			<td>string</td>
+			<td>manager</td>
+			<td>complex</td>
 			<td>false</td>
-			<td>The country name component.</td>
+			<td>The User's manager.  A complex type that optionally allows service providers to represent organizational hierarchy by referencing the 'id' attribute of another User.</td>
 			<td>false</td>
-			<td>false</td>
+			<td></td>
 			<td>readWrite</td>
 			<td>default</td>
-			<td>none</td>
-		</tr>
-		<tr>
-			<td>type</td>
-			<td>string</td>
-			<td>false</td>
-			<td>A label indicating the attribute's function, e.g., 'work' or 'home'.</td>
-			<td>false</td>
-			<td>false</td>
-			<td>readWrite</td>
-			<td>default</td>
-			<td>none</td>
+			<td></td>
 		</tr>
 		<tr>
 			<td></td>

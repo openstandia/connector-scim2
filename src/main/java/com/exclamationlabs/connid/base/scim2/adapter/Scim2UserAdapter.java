@@ -60,7 +60,8 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     result.add(new ConnectorAttribute(locale.name(), STRING));
     result.add(new ConnectorAttribute(timezone.name(), STRING));
     result.add(new ConnectorAttribute(OperationalAttributes.ENABLE_NAME,active.name(), BOOLEAN));
-    result.add(new ConnectorAttribute(OperationalAttributes.PASSWORD_NAME,password.name(), GUARDED_STRING, NOT_READABLE, NOT_RETURNED_BY_DEFAULT));
+    result.add(new ConnectorAttribute(active.name(), BOOLEAN));
+    result.add(new ConnectorAttribute(password.name(), GUARDED_STRING, NOT_READABLE, NOT_RETURNED_BY_DEFAULT));
     result.add(new ConnectorAttribute(addresses.name(), STRING, MULTIVALUED));
     result.add(new ConnectorAttribute(emails.name(), STRING, MULTIVALUED, REQUIRED));
     result.add(new ConnectorAttribute(phoneNumbers.name(), STRING, MULTIVALUED));
@@ -409,8 +410,8 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     attributes.add(AttributeBuilder.build(OperationalAttributes.ENABLE_NAME, user.getActive()));
     attributes.add(AttributeBuilder.build(displayName.name(), user.getUserName()));
     attributes.add(AttributeBuilder.build(externalId.name(), user.getExternalId()));
-    attributes.add(AttributeBuilder.build(id.name(), user.getId()));
-    attributes.add(AttributeBuilder.build(Uid.NAME, user.getId()));
+    attributes.add(AttributeBuilder.build(id.name(), user.getIdentityIdValue()));
+    attributes.add(AttributeBuilder.build(Uid.NAME, user.getIdentityIdValue()));
     attributes.add(AttributeBuilder.build(locale.name(), user.getLocale()));
     if ( user.getName() != null )
     {
@@ -426,7 +427,7 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     attributes.add(AttributeBuilder.build(profileUrl.name(), user.getProfileUrl()));
     attributes.add(AttributeBuilder.build(timezone.name(), user.getTimezone()));
     attributes.add(AttributeBuilder.build(title.name(), user.getTitle()));
-    attributes.add(AttributeBuilder.build(userName.name(), user.getUserName()));
+    // attributes.add(AttributeBuilder.build(userName.name(), user.getIdentityNameValue()));
     attributes.add(AttributeBuilder.build(Name.NAME, user.getUserName()));
     attributes.add(AttributeBuilder.build(userType.name(), user.getUserType()));
 
