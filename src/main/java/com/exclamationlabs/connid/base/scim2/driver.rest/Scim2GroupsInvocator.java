@@ -33,7 +33,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
       RestRequest request =
               new RestRequest.Builder<>(Scim2Group.class)
                       .withPost()
-                      .withRequestUri(driver.getConfiguration().getGroupEndpointUrl())
+                      .withRequestUri(driver.getConfiguration().getGroupsEndpointUrl())
                       .withRequestBody(model)
                       .build();
 
@@ -56,7 +56,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
     Scim2Configuration config = driver.getConfiguration();
     RestRequest req = new RestRequest.Builder<>(Void.class)
             .withDelete()
-            .withRequestUri(config.getGroupEndpointUrl() + "/" +groupId)
+            .withRequestUri(config.getGroupsEndpointUrl() + "/" +groupId)
             .build();
     RestResponseData<Void> data = driver.executeRequest(req);
   }
@@ -84,7 +84,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
     RestRequest request =
             new RestRequest.Builder<>(ListGroupResponse.class)
                     .withGet()
-                    .withRequestUri(config.getGroupEndpointUrl() + query )
+                    .withRequestUri(config.getGroupsEndpointUrl() + query )
                     .build();
     RestResponseData<ListGroupResponse> data = driver.executeRequest(request);
     ListGroupResponse response = data.getResponseObject();
@@ -124,7 +124,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
       RestRequest req =
               new RestRequest.Builder<>(Scim2Group.class)
                       .withGet()
-                      .withRequestUri(config.getGroupEndpointUrl() + "/" + objectId)
+                      .withRequestUri(config.getGroupsEndpointUrl() + "/" + objectId)
                       .build();
       RestResponseData<Scim2Group> response = driver.executeRequest(req);
       if (response.getResponseStatusCode() == 200) {
@@ -137,7 +137,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
       RestRequest req =
               new RestRequest.Builder<>(Scim2Group.class)
                       .withGet()
-                      .withRequestUri(config.getGroupEndpointUrl() + "/" + objectId)
+                      .withRequestUri(config.getGroupsEndpointUrl() + "/" + objectId)
                       .build();
       RestResponseData<Scim2Group> response = driver.executeRequest(req);
       if (response.getResponseStatusCode() == 200) {
@@ -157,7 +157,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
     RestRequest request =
             new RestRequest.Builder<>(ListGroupResponse.class)
                     .withGet()
-                    .withRequestUri(config.getGroupEndpointUrl() + query )
+                    .withRequestUri(config.getGroupsEndpointUrl() + query )
                     .build();
     RestResponseData<ListGroupResponse> data = driver.executeRequest(request);
 
@@ -186,7 +186,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
     if ( model.getDisplayName() != null && model.getDisplayName().length() > 0 ) {
       RestRequest req = new RestRequest.Builder<>(Scim2User.class)
               .withPut()
-              .withRequestUri(config.getGroupEndpointUrl() + "/" + groupId)
+              .withRequestUri(config.getGroupsEndpointUrl() + "/" + groupId)
               .withRequestBody(model)
               .build();
       RestResponseData<Scim2User> response = driver.executeRequest(req);
@@ -200,7 +200,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
                             Set<Map<String, String>> remove)
   {
     boolean hasWork = false;
-    String url = driver.getConfiguration().getGroupEndpointUrl() + "/" + groupId;
+    String url = driver.getConfiguration().getGroupsEndpointUrl() + "/" + groupId;
     Scim2PatchOp patchOp = new Scim2PatchOp();
     patchOp.setOperations(new ArrayList<>());
 

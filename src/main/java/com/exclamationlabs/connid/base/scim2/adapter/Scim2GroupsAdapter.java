@@ -7,7 +7,6 @@ import static org.identityconnectors.framework.common.objects.AttributeInfo.Flag
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
-import com.exclamationlabs.connid.base.scim2.adapter.slack.Scim2SlackGroupsAdapter;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 
@@ -19,6 +18,7 @@ import org.identityconnectors.framework.common.objects.*;
 public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configuration> {
   public static final String SCIM2_GROUP ="Scim2Group";
   public static final String SCIM2_CORE_GROUP_SCHEMA = "urn:ietf:params:scim:schemas:core:2.0:Group";
+
   @Override
   public ObjectClass getType() {
     return new ObjectClass(SCIM2_GROUP);
@@ -56,30 +56,19 @@ public class Scim2GroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configurati
 
     Set<ConnectorAttribute> result = null;
 
-    if ( isSlack || isAWS || isStandard )
-    {
-      // Slack and Amazon Web Service share the same group attributes as the core scim2 group schema
-      result = new HashSet<>();
-      result.add(new ConnectorAttribute(Uid.NAME, id.name(), STRING, NOT_UPDATEABLE, REQUIRED));
-      // A human-readable name for the Group.
-      result.add(new ConnectorAttribute(Name.NAME, displayName.name(), STRING, REQUIRED));
-      result.add(new ConnectorAttribute(externalId.name(), STRING));
-      /*
-       * Identifier for members of the Group.
-       * This is a JSON string containing sub attributes
-       * value, $ref, and type
-       */
-      result.add(new ConnectorAttribute(members.name(), STRING, MULTIVALUED));
-    }
-    else
-    {
-      /*
-       * We are treating this as the dynamic implementation
-       */
-      Scim2SlackGroupsAdapter scim2SlackGroupsAdapter = new Scim2SlackGroupsAdapter();
-      scim2SlackGroupsAdapter.setConfig(getConfiguration().getSchemaRawJson());
-      result = scim2SlackGroupsAdapter.getConnectorAttributes();
-    }
+    // Slack and Amazon Web Service share the same group attributes as the core scim2 group schema
+    result = new HashSet<>();
+    result.add(new ConnectorAttribute(Uid.NAME, id.name(), STRING, NOT_UPDATEABLE, REQUIRED));
+    // A human-readable name for the Group.
+    result.add(new ConnectorAttribute(Name.NAME, displayName.name(), STRING, REQUIRED));
+    result.add(new ConnectorAttribute(externalId.name(), STRING));
+    /*
+     * Identifier for members of the Group.
+     * This is a JSON string containing sub attributes
+     * value, $ref, and type
+     */
+    result.add(new ConnectorAttribute(members.name(), STRING, MULTIVALUED));
+
     return result;
   }
 

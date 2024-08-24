@@ -1,4 +1,4 @@
-package com.exclamationlabs.connid.base.scim2.adapter.slack;
+package com.exclamationlabs.connid.base.scim2.adapter.dynamic;
 
 import com.exclamationlabs.connid.base.connector.adapter.AdapterValueTypeConverter;
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
@@ -13,14 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.*;
 import org.identityconnectors.framework.common.objects.Attribute;
-import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 
 /**
  * Dynamic Groups Adapter
  */
-public class Scim2SlackGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configuration> {
+public class Scim2DynamicGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Configuration> {
 
   @Override
   public ObjectClass getType() {

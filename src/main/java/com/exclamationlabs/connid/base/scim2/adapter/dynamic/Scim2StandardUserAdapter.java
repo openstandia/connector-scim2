@@ -1,4 +1,4 @@
-package com.exclamationlabs.connid.base.scim2.adapter.standard;
+package com.exclamationlabs.connid.base.scim2.adapter.dynamic;
 
 import com.exclamationlabs.connid.base.connector.adapter.BaseAdapter;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
@@ -44,8 +44,9 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
   @Override
   public Set<ConnectorAttribute> getConnectorAttributes() {
 
-    String rawJson = getConfiguration().getSchemaRawJson();
-    System.out.println("RAW JSON ---> " + rawJson);
+    // String rawJson = getConfiguration().getSchemaRawJson();
+    String rawJson = "{}";
+    // System.out.println("RAW JSON ---> " + rawJson);
     ObjectMapper objectMapper = new ObjectMapper();
     List<Scim2Schema> schemaPojo = null;
 

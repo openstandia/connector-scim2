@@ -2,16 +2,18 @@ package com.exclamationlabs.connid.base.scim2.model.response;
 
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.List;
 import java.util.Set;
 
 
-public class ListUsersResponse {
+public class ListDynamicUsersResponse
+{
   @SerializedName("itemsPerPage")
   private Integer itemsPerPage;
   @SerializedName("Resources")
-  private List<Scim2User> resources;
+  private List<LinkedTreeMap> resources;
   private Set<String> schemas;
   @SerializedName("startIndex")
   private Integer startIndex;
@@ -23,7 +25,7 @@ public class ListUsersResponse {
     return itemsPerPage;
   }
 
-  public List<Scim2User> getResources() {
+  public List<LinkedTreeMap> getResources() {
     return resources;
   }
 
@@ -47,7 +49,7 @@ public class ListUsersResponse {
     this.itemsPerPage = itemsPerPage;
   }
 
-  public void setResources(List<Scim2User> resources) {
+  public void setResources(List<LinkedTreeMap> resources) {
     this.resources = resources;
   }
 

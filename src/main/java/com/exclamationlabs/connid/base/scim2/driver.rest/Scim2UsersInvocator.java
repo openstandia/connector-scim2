@@ -9,6 +9,7 @@ import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.driver.rest.slack.Scim2SlackUsersInvocator;
 import com.exclamationlabs.connid.base.scim2.model.*;
+import com.exclamationlabs.connid.base.scim2.model.response.ListSlackUsersResponse;
 import com.exclamationlabs.connid.base.scim2.model.response.ListUsersResponse;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import org.identityconnectors.common.logging.Log;
@@ -110,12 +111,12 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
         }
         else if (config.getEnableAWSSchema() || config.getEnableStandardSchema())
         {
-
+            allUsers = getUsersList(driver, filter, paginator);
         }
         else if (config.getEnableDynamicSchema())
         {
             // Dynamic Schema user LinkedTreeList
-            ;
+            allUsers = getUsersList(driver, filter, paginator);;
         }
         return (Set<Scim2User>) allUsers;
     }
@@ -246,6 +247,49 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
         return new LinkedHashMap<>();
     }
 
+    public Set<Scim2User> getUsersList( Scim2Driver driver, ResultsFilter filter, ResultsPaginator paginator)
+    {
+        Scim2Configuration config = driver.getConfiguration();
+        List<Scim2User> userList = new ArrayList<>();
+        String filterParameter = Scim2UsersInvocator.getFilterParameter(filter);
+        String pagingParameter = Scim2UsersInvocator.getPagingParameter(paginator);
+        String query = "";
+        if (pagingParameter != null && filterParameter != null)
+        {
+            query = "?" + pagingParameter + "&" + filterParameter;
+        }
+        else if (pagingParameter != null)
+        {
+            query = "?" + pagingParameter;
+        }
+        else if (filterParameter != null)
+        {
+            query = "?" + filterParameter;
+        }
+        RestRequest request =
+                new RestRequest.Builder<>(ListUsersResponse.class)
+                        .withGet()
+                        .withRequestUri(config.getUsersEndpointUrl() + query)
+                        .build();
+        RestResponseData<ListUsersResponse> data = driver.executeRequest(request);
+        ListUsersResponse response = data.getResponseObject();
+
+        if (response != null && data.getResponseStatusCode() == 200)
+        {
+            userList = response.getResources();
+            if ( userList != null && userList.size() > 0 ) {
+                updatePaginator(paginator, userList.size(), response.getTotalResults(), response.getItemsPerPage());
+            } else {
+                paginator.setNoMoreResults(true);
+            }
+        } else {
+            paginator.setNoMoreResults(true);
+        }
+        // Convert the list to a Set
+        Set<Scim2User> subSet = new HashSet<>(userList);
+
+        return subSet;
+    }
     @Override
     public void update(Scim2Driver driver, String userId, Scim2User user)
             throws ConnectorException

@@ -65,12 +65,13 @@ dependencies {
     // HTTP/RESTful support
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'net.tirasa.connid:connector-framework-internal:1.5.1.10'
 
     implementation 'commons-codec:commons-codec:1.15'
 
     implementation "com.exclamationlabs.connid:connector-base:${base_connector_version}-+"
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.2.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
 
     testImplementation "com.exclamationlabs.connid:connector-base-test-support:${test_connector_version}-+"
 

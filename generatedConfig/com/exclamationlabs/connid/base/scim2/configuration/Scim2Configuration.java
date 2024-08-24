@@ -39,9 +39,8 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationInfo(path="results.deepGet")
     private Boolean deepGet;
 
-    @NotBlank(message="userSchemaIdList cannot be blank")
     @ConfigurationInfo(path="custom.userSchemaIdList")
-    private String userSchemaIdList;
+    private String[] userSchemaIdList;
 
     @ConfigurationInfo(path="results.pagination")
     private Boolean pagination;
@@ -49,6 +48,10 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @NotNull(message="enableDynamicSchema cannot be null")
     @ConfigurationInfo(path="custom.enableDynamicSchema")
     private Boolean enableDynamicSchema = false;
+
+    @NotBlank(message="groupsEndpointUrl cannot be blank")
+    @ConfigurationInfo(path="custom.groupsEndpointUrl")
+    private String groupsEndpointUrl;
 
     @NotBlank(message="serviceUrl cannot be blank")
     @ConfigurationInfo(path="service.serviceUrl")
@@ -58,9 +61,8 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationInfo(path="results.importBatchSize")
     private Integer importBatchSize = 50;
 
-    @NotBlank(message="groupSchemaIDList cannot be blank")
-    @ConfigurationInfo(path="custom.groupSchemaIDList")
-    private String groupSchemaIDList;
+    @ConfigurationInfo(path="custom.groupSchemaIdList")
+    private String[] groupSchemaIdList;
 
     @NotBlank(message="usersEndpointUrl cannot be blank")
     @ConfigurationInfo(path="custom.usersEndpointUrl")
@@ -70,17 +72,9 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationInfo(path="custom.enableStandardSchema")
     private Boolean enableStandardSchema = false;
 
-    @NotBlank(message="resourceTypeRawJson cannot be blank")
-    @ConfigurationInfo(path="custom.resourceTypeRawJson")
-    private String resourceTypeRawJson;
-
     @NotBlank(message="token cannot be blank")
     @ConfigurationInfo(path="security.authenticator.directAccessToken.token")
     private String token;
-
-    @NotBlank(message="schemaUrl cannot be blank")
-    @ConfigurationInfo(path="custom.schemaUrl")
-    private String schemaUrl;
 
     @NotNull(message="enableAWSSchema cannot be null")
     @ConfigurationInfo(path="custom.enableAWSSchema")
@@ -98,32 +92,12 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationInfo(path="rest.ioErrorRetries")
     private Integer ioErrorRetries = 5;
 
-    @NotBlank(message="schemaRawJson cannot be blank")
-    @ConfigurationInfo(path="custom.schemaRawJson")
-    private String schemaRawJson;
-
     @ConfigurationInfo(path="results.deepImport")
     private Boolean deepImport;
-
-    @NotBlank(message="resourceTypeUrl cannot be blank")
-    @ConfigurationInfo(path="custom.resourceTypeUrl")
-    private String resourceTypeUrl;
-
-    @NotNull(message="useResourceTypeUrl cannot be null")
-    @ConfigurationInfo(path="custom.useResourceTypeUrl")
-    private Boolean useResourceTypeUrl = false;
-
-    @NotBlank(message="groupEndpointUrl cannot be blank")
-    @ConfigurationInfo(path="custom.groupEndpointUrl")
-    private String groupEndpointUrl;
 
     @NotNull(message="enableEnterpriseUser cannot be null")
     @ConfigurationInfo(path="custom.enableEnterpriseUser")
     private Boolean enableEnterpriseUser = false;
-
-    @NotNull(message="useSchemaUrl cannot be null")
-    @ConfigurationInfo(path="custom.useSchemaUrl")
-    private Boolean useSchemaUrl = false;
 
 
     public Scim2Configuration() {
@@ -155,14 +129,14 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationProperty(
     displayMessageKey = "User SchemaId List",
     helpMessageKey = "A list of user schemas that define a user. This is discoverable from the Resource Type URL, JSON, or by one of the prebuilt java classes",
-    order = 830,
+    order = 3100,
     confidential = false,
-    required = true)
-    public String getUserSchemaIdList() {
+    required = false)
+    public String[] getUserSchemaIdList() {
         return this.userSchemaIdList;
     }
 
-    public void setUserSchemaIdList(String input) {
+    public void setUserSchemaIdList(String[] input) {
         this.userSchemaIdList = input;
     }
 
@@ -183,7 +157,7 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationProperty(
     displayMessageKey = "Enable Dynamic Schema",
     helpMessageKey = "Use the Resource Type and/or the Schema defined ",
-    order = 800,
+    order = 3050,
     confidential = false,
     required = true)
     public Boolean getEnableDynamicSchema() {
@@ -192,6 +166,20 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
 
     public void setEnableDynamicSchema(Boolean input) {
         this.enableDynamicSchema = input;
+    }
+
+    @ConfigurationProperty(
+    displayMessageKey = "Groups Endpoint URL",
+    helpMessageKey = "Discovered from the resource type or entered manually",
+    order = 3070,
+    confidential = false,
+    required = true)
+    public String getGroupsEndpointUrl() {
+        return this.groupsEndpointUrl;
+    }
+
+    public void setGroupsEndpointUrl(String input) {
+        this.groupsEndpointUrl = input;
     }
 
     @ConfigurationProperty(
@@ -225,21 +213,21 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationProperty(
     displayMessageKey = "Group SchemaId List",
     helpMessageKey = "A list of Group schemas that define a Group. This is discoverable from the Resource Type URL or JSON. or by one of the prebuilt java classes ",
-    order = 840,
+    order = 3200,
     confidential = false,
-    required = true)
-    public String getGroupSchemaIDList() {
-        return this.groupSchemaIDList;
+    required = false)
+    public String[] getGroupSchemaIdList() {
+        return this.groupSchemaIdList;
     }
 
-    public void setGroupSchemaIDList(String input) {
-        this.groupSchemaIDList = input;
+    public void setGroupSchemaIdList(String[] input) {
+        this.groupSchemaIdList = input;
     }
 
     @ConfigurationProperty(
     displayMessageKey = "Users Endpoint URL",
     helpMessageKey = "Discovered from the resource type or entered manually",
-    order = 810,
+    order = 3060,
     confidential = false,
     required = true)
     public String getUsersEndpointUrl() {
@@ -253,7 +241,7 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationProperty(
     displayMessageKey = "Enable Standard Schema",
     helpMessageKey = "Uses prebuilt java objects based on the stand schema. ",
-    order = 760,
+    order = 3010,
     confidential = false,
     required = true)
     public Boolean getEnableStandardSchema() {
@@ -262,20 +250,6 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
 
     public void setEnableStandardSchema(Boolean input) {
         this.enableStandardSchema = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Resource Type JSON",
-    helpMessageKey = "The actual resource types for a particular service provider",
-    order = 740,
-    confidential = false,
-    required = true)
-    public String getResourceTypeRawJson() {
-        return this.resourceTypeRawJson;
-    }
-
-    public void setResourceTypeRawJson(String input) {
-        this.resourceTypeRawJson = input;
     }
 
     @ConfigurationProperty(
@@ -293,23 +267,9 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     }
 
     @ConfigurationProperty(
-    displayMessageKey = "Schema URL",
-    helpMessageKey = "URL to discover schema for a particular service provider",
-    order = 701,
-    confidential = false,
-    required = true)
-    public String getSchemaUrl() {
-        return this.schemaUrl;
-    }
-
-    public void setSchemaUrl(String input) {
-        this.schemaUrl = input;
-    }
-
-    @ConfigurationProperty(
     displayMessageKey = "Enable AWS Schema",
     helpMessageKey = "Use a pre-built java objects as defined for AWS As specified here https://docs.aws.amazon.com/singlesignon/latest/developerguide/what-is-scim.html",
-    order = 780,
+    order = 3030,
     confidential = false,
     required = true)
     public Boolean getEnableAWSSchema() {
@@ -323,7 +283,7 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     @ConfigurationProperty(
     displayMessageKey = "Enable Slack Schema",
     helpMessageKey = "Use prebuilt java classes as define for Slack as specified here: https://api.slack.com/admins/scim2",
-    order = 790,
+    order = 3040,
     confidential = false,
     required = true)
     public Boolean getEnableSlackSchema() {
@@ -363,20 +323,6 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     }
 
     @ConfigurationProperty(
-    displayMessageKey = "Schema JSON",
-    helpMessageKey = "The actual Schema return for a particular service provider. This can be populated from the URL at discovery time.",
-    order = 710,
-    confidential = false,
-    required = true)
-    public String getSchemaRawJson() {
-        return this.schemaRawJson;
-    }
-
-    public void setSchemaRawJson(String input) {
-        this.schemaRawJson = input;
-    }
-
-    @ConfigurationProperty(
     displayMessageKey = "Deep Import Enabled",
     helpMessageKey = "If true, an individual getOne request for each item in Import getAll requests will be performed.",
     order = 1102,
@@ -391,51 +337,9 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
     }
 
     @ConfigurationProperty(
-    displayMessageKey = "Resource Type URL",
-    helpMessageKey = "URL to Discover resource type for a particular service provider. These included Users and Groups URL endpoints. ",
-    order = 730,
-    confidential = false,
-    required = true)
-    public String getResourceTypeUrl() {
-        return this.resourceTypeUrl;
-    }
-
-    public void setResourceTypeUrl(String input) {
-        this.resourceTypeUrl = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Use Resource Type URL",
-    helpMessageKey = "Whether to use the URL or the JSON. Especially when the URL is not supported by the service provider.",
-    order = 750,
-    confidential = false,
-    required = true)
-    public Boolean getUseResourceTypeUrl() {
-        return this.useResourceTypeUrl;
-    }
-
-    public void setUseResourceTypeUrl(Boolean input) {
-        this.useResourceTypeUrl = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Group Endpoint URL",
-    helpMessageKey = "Discovered from the resource type or entered manually",
-    order = 820,
-    confidential = false,
-    required = true)
-    public String getGroupEndpointUrl() {
-        return this.groupEndpointUrl;
-    }
-
-    public void setGroupEndpointUrl(String input) {
-        this.groupEndpointUrl = input;
-    }
-
-    @ConfigurationProperty(
     displayMessageKey = "Enable Enterprise User",
     helpMessageKey = "Extend the user schema with enterprise attributes ",
-    order = 770,
+    order = 3020,
     confidential = false,
     required = true)
     public Boolean getEnableEnterpriseUser() {
@@ -444,20 +348,6 @@ public class Scim2Configuration implements ConnectorConfiguration, RestConfigura
 
     public void setEnableEnterpriseUser(Boolean input) {
         this.enableEnterpriseUser = input;
-    }
-
-    @ConfigurationProperty(
-    displayMessageKey = "Use Schema URL",
-    helpMessageKey = "Where to use URL or JSON especially when URL is not available",
-    order = 720,
-    confidential = false,
-    required = true)
-    public Boolean getUseSchemaUrl() {
-        return this.useSchemaUrl;
-    }
-
-    public void setUseSchemaUrl(Boolean input) {
-        this.useSchemaUrl = input;
     }
 
 

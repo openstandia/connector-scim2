@@ -690,20 +690,11 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
       adapter.setConfiguration(getConfiguration());
       adapter.setDriver(getDriver());
       result = adapter.getConnectorAttributes();
-    } else if (isAWS || isStandard) {
+    } else {
       // call Standard Attributes method
       result = getCoreConnectorAttributes();
       // call enterprise attributes method
       result.addAll(getEnterpriseConnectorAttributes());
-    }
-    else if ( isDynamic )
-    {
-      // If user Dynamic, Build Connector Attributes from schema download
-      /* Moved to Dynamic Adapter
-      Scim2SlackUserAdapter scim2SlackUserAdapter = new Scim2SlackUserAdapter();
-      scim2SlackUserAdapter.setConfig(getConfiguration().getSchemaRawJson());
-      result = scim2SlackUserAdapter.getConnectorAttributes();
-      */
     }
     return result;
   }
@@ -713,15 +704,23 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     Set<Attribute> attributes = null;
     Scim2Configuration config = getConfiguration();
 
-    if (config.getEnableSlackSchema()) {
+    if (config.getEnableSlackSchema())
+    {
       attributes = new Scim2SlackUserAdapter().constructAttributes(user);
-    } else if (config.getEnableAWSSchema() || config.getEnableStandardSchema()  ) {
+    } else if ( config.getEnableStandardSchema()  )
+    {
       attributes = populateCoreAttributes(user);
       if ( config.getEnableEnterpriseUser() ) {
         attributes.addAll(populateEnterpriseAttributes(user));
       }
     }
-    else if ( config.getEnableDynamicSchema() ) {
+    else if (config.getEnableAWSSchema() )
+    {
+      attributes = populateCoreAttributes(user);
+      attributes.addAll(populateEnterpriseAttributes(user));
+    }
+    else if ( config.getEnableDynamicSchema() )
+    {
       attributes = populateCoreAttributes(user);
     }
     return attributes;
@@ -738,10 +737,27 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
 
     Scim2Configuration config = getConfiguration();
 
-    if (config.getEnableStandardSchema()
-            || config.getEnableEnterpriseUser()
-            || config.getEnableAWSSchema()) {
-      // Standard, and AWS
+    if (config.getEnableStandardSchema())
+    {
+      // Standard
+      user = new Scim2User();
+      populateCoreUser(user,
+              attributes,
+              addedMultiValueAttributes,
+              removedMultiValueAttributes,
+              isCreate );
+      if ( config.getEnableEnterpriseUser())
+      {
+        populateEnterpriseUser(user,
+                attributes,
+                addedMultiValueAttributes,
+                removedMultiValueAttributes,
+                isCreate);
+      }
+    }
+    else if (config.getEnableAWSSchema())
+    {
+      // AWS
       user = new Scim2User();
       populateCoreUser(user,
               attributes,
@@ -754,18 +770,21 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
               removedMultiValueAttributes,
               isCreate );
     }
-    else if (getConfiguration().getEnableSlackSchema()) {
+    else if (config.getEnableSlackSchema()) {
       Scim2SlackUserAdapter adapter = new Scim2SlackUserAdapter();
       user = adapter.constructModel(
               attributes,
               addedMultiValueAttributes,
               removedMultiValueAttributes,
               isCreate);
-    } else if (getConfiguration().getEnableDynamicSchema()) {
+    } else if (config.getEnableDynamicSchema()) {
       // Handle Dynamic Schema
       user = new Scim2User();
-      user.setId(AdapterValueTypeConverter.getIdentityIdAttributeValue(attributes));
-      user.setUserName(AdapterValueTypeConverter.getIdentityNameAttributeValue(attributes));
+      populateCoreUser(user,
+              attributes,
+              addedMultiValueAttributes,
+              removedMultiValueAttributes,
+              isCreate );
     }
     return user;
   }
