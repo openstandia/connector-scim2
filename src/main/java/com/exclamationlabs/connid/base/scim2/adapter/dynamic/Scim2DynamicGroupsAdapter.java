@@ -7,10 +7,8 @@ import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDat
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
 import com.exclamationlabs.connid.base.scim2.model.Scim2Schema;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.*;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeInfo;
@@ -50,12 +48,14 @@ public class Scim2DynamicGroupsAdapter extends BaseAdapter<Scim2Group, Scim2Conf
     Map<String, Object> userMap = new HashMap<>();
     Set<ConnectorAttribute> attributeInfos = new HashSet<>();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+/*
     try {
       schemaPojo = objectMapper.readValue(rawJson, new TypeReference<List<Scim2Schema>>() {});
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
+ */
 
     Set<ConnectorAttribute> result = new HashSet<>();
     schemaPojo.forEach(

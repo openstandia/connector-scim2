@@ -1,92 +1,99 @@
 package com.exclamationlabs.connid.base.scim2.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
-import javax.annotation.Generated;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.google.gson.annotations.SerializedName;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-// @JsonPropertyOrder({"id", "name", "description", "attributes", "meta"})
-// @JsonPropertyOrder({"Resources"})
-@Generated("jsonschema2pojo")
-@Data
-// @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+import java.util.List;
+
+
+
 public class Scim2Schema {
 
-  /*@JsonProperty("schemas")
-  public List<String> schemas;
-  @JsonProperty("Resources")
-  public List<Resource> resources;
-  public static class Resource{
-    @JsonProperty("id")
-    public String id;
-
-    @JsonProperty("name")
-    public String name;
-
-    @JsonProperty("description")
-    public String description;
-
-    @JsonProperty("attributes")
-    public List<Attribute> attributes;
-    private Map<String, Object> extensions = new HashMap<>();
-
-    @JsonProperty("meta")
-    public Meta meta;
-  }*/
-
-  @JsonProperty("id")
   private String id;
-
-  @JsonProperty("name")
   private String name;
-
-  @JsonProperty("description")
   private String description;
-
-  @JsonProperty("attributes")
   public List<Attribute> attributes;
-
-  @JsonProperty("meta")
   private Meta meta;
 
   public static class Attribute {
-    @JsonProperty("name")
+    @SerializedName("name")
     public String name;
 
-    @JsonProperty("type")
+    @SerializedName("type")
     public String type;
 
-    @JsonProperty("multiValued")
+    @SerializedName("multiValued")
     public Boolean multiValued;
 
-    @JsonProperty("description")
+    @SerializedName("description")
     public String description;
 
-    @JsonProperty("required")
+    @SerializedName("required")
     public Boolean required;
 
-    @JsonProperty("caseExact")
+    @SerializedName("caseExact")
     public Boolean caseExact;
 
-    @JsonProperty("mutability")
+    @SerializedName("mutability")
     public String mutability;
 
-    @JsonProperty("returned")
+    @SerializedName("returned")
     public String returned;
 
-    @JsonProperty("uniqueness")
+    @SerializedName("uniqueness")
     public String uniqueness;
 
-    @JsonProperty("subAttributes")
+    @SerializedName("subAttributes")
     public List<Attribute> subAttributes;
 
-    // @JsonProperty("referenceTypes")
-    // public List<String> referenceTypes;
+  }
+
+  public String getId()
+  {
+    return id;
+  }
+
+  public void setId(String id)
+  {
+    this.id = id;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public String getDescription()
+  {
+    return description;
+  }
+
+  public void setDescription(String description)
+  {
+    this.description = description;
+  }
+
+  public List<Attribute> getAttributes()
+  {
+    return attributes;
+  }
+
+  public void setAttributes(List<Attribute> attributes)
+  {
+    this.attributes = attributes;
+  }
+
+  public Meta getMeta()
+  {
+    return meta;
+  }
+
+  public void setMeta(Meta meta)
+  {
+    this.meta = meta;
   }
 }
