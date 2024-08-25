@@ -1,6 +1,5 @@
 package com.exclamationlabs.connid.base.scim2.model.response;
 
-import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.internal.LinkedTreeMap;
 

@@ -1,5 +1,5 @@
-<table border=1>
-	<thead style="border: 1px black;">
+<table style="border: 1px black;">
+	<thead style="text-align: left;">
 		<tr>
 			<th>name</th>
 			<th>type</th>

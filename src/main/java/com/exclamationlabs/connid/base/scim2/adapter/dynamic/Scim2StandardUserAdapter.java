@@ -5,7 +5,6 @@ import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttribute;
 import com.exclamationlabs.connid.base.connector.attribute.ConnectorAttributeDataType;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.model.*;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -49,12 +48,14 @@ public class Scim2StandardUserAdapter extends BaseAdapter<Scim2User, Scim2Config
     // System.out.println("RAW JSON ---> " + rawJson);
     ObjectMapper objectMapper = new ObjectMapper();
     List<Scim2Schema> schemaPojo = null;
-
+/*
     try {
       schemaPojo = objectMapper.readValue(rawJson, new TypeReference<List<Scim2Schema>>() {});
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
+ */
     result = new HashSet<>();
 
     schemaPojo.forEach(
