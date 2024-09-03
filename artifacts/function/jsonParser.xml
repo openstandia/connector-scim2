@@ -10,23 +10,42 @@
             <type xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:string</type>
         </parameter>
         <parameter xsi:type="c:ExpressionParameterType">
-            <name>attribute</name>
+            <name>primary</name>
             <type xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:string</type>
+        </parameter>
+        <parameter xsi:type="c:ExpressionParameterType">
+            <name>type</name>
+            <type xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:string</type>
+        </parameter>
+        <parameter xsi:type="c:ExpressionParameterType">
+            <name>group</name>
+            <type xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:boolean</type>
         </parameter>
         <returnType xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:string</returnType>
         <script>
             <code>
                 import groovy.json.JsonSlurper
-
-                // How to implement in mapping
-                // map = new HashMap()
-                // map.put("attribute", "role_value")
-                // map.put("response", input)
-                // attributeValue = provision.execute("jsonParser", map)
-
                 jsonSlurper = new JsonSlurper()
-                data = jsonSlurper.parseText(response)
-                return data[attribute]
+
+                if(response == null || response == ""){
+                    return null
+                }
+
+                // Store parsed response in a collection to make use of Groovy's findAll closure
+                data = [jsonSlurper.parseText(response)]
+
+                // If there is no value or value is an empty string, return null
+                if(data?.value == null || data?.value == ''){
+                    return null
+                }
+
+                // Groups and Roles don't have type or primary, just id and displayName
+                if(group){
+                    return data.value
+                }
+
+                // return the item found, or null if nothing is found
+                return data.findAll{it?.primary?.toString() == primary || it?.type == type}?.value
             </code>
         </script>
     </function>
