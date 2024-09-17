@@ -3,6 +3,30 @@
     <description>Functions common scripts by ProvisionIAM</description>
     <iteration>0</iteration>
     <iterationToken/>
+	<function>
+        <name>jsonComposer</name>
+        <parameter xsi:type="c:ExpressionParameterType">
+            <name>map</name>
+            <type xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:anyType</type>
+        </parameter>
+        <returnType xmlns:xsd="http://www.w3.org/2001/XMLSchema">xsd:string</returnType>
+        <script>
+            <code>
+                jsonArray = []
+                jsonMap = '{'
+
+                map.each{ key, value -&gt;
+                    jsonArray += '"' + key + '": "' + value + '"'
+                }
+
+                jsonMap += jsonArray.join(",") + '}'
+
+                log.error("JSON_MAP: {}", jsonMap)
+
+                return jsonMap
+            </code>
+        </script>
+    </function>
     <function>
         <name>jsonParser</name>
         <parameter xsi:type="c:ExpressionParameterType">

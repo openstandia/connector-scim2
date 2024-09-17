@@ -37,6 +37,23 @@
             </focus>
             <attribute id="26">
                 <ref>ri:emails</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <expression>
+                        <script>
+                            <code>
+                                valueMap = new HashMap()
+                                jsonMap = [:]
+
+                                jsonMap.put("value", focus.emailAddress)
+                                jsonMap.put("primary", true)
+
+                                valueMap.put("map", jsonMap)
+                                return provision.execute("jsonComposer", valueMap)
+                            </code>
+                        </script>
+                    </expression>
+                </outbound>
                 <inbound id="27">
                     <strength>strong</strength>
                     <expression>
@@ -60,6 +77,40 @@
             </attribute>
             <attribute id="29">
                 <ref>ri:phoneNumbers</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <path>$focus/telephoneNumber</path>
+                    </source>
+                    <source>
+                        <path>$focus/personalNumber</path>
+                    </source>
+                    <expression>
+                        <script>
+                            <code>
+                                if(!telephoneNumber &amp;&amp; !personalNumber){
+                                    return
+                                }
+
+                                valueMap = new HashMap()
+                                jsonMap = [:]
+
+                                if(telephoneNumber){
+                                    jsonMap.put("value", telephoneNumber)
+                                    jsonMap.put("primary", true)
+                                }
+                                if(personalNumber){
+                                    jsonMap.put("value", personalNumber)
+                                    jsonMap.put("type", "mobile")
+                                    jsonMap.put("primary", false)
+                                }
+
+                                valueMap.put("map", jsonMap)
+                                return provision.execute("jsonComposer", valueMap)
+                            </code>
+                        </script>
+                    </expression>
+                </outbound>
                 <inbound id="30">
                     <strength>strong</strength>
                     <expression>
@@ -103,6 +154,11 @@
             </attribute>
             <attribute id="37">
                 <ref>ri:userName</ref>
+                <outbound id="38">
+                    <source>
+                        <path>name</path>
+                    </source>
+                </outbound>
                 <inbound id="38">
                     <target>
                         <path>name</path>
@@ -145,8 +201,7 @@
                 <ref>ri:groups</ref>
                 <inbound>
                     <expression>
-                        <assignmentTargetSearch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                                xsi:type="c:SearchObjectRefExpressionEvaluatorType">
+                        <assignmentTargetSearch>
                             <targetType>RoleType</targetType>
                             <filter>
                                 <q:equal>
@@ -218,6 +273,12 @@
                         <synchronize id="11">
                             <synchronize>true</synchronize>
                         </synchronize>
+                    </actions>
+                </reaction>
+                <reaction id="34">
+                    <situation>unmatched</situation>
+                    <actions>
+                        <addFocus id="35"/>
                     </actions>
                 </reaction>
             </synchronization>
