@@ -6,14 +6,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Scim2PatchOp
+public class Scim2PatchOpSingle
 {
     private static final String SCIM2_PATCH_OP = "urn:ietf:params:scim:api:messages:2.0:PatchOp";
     private Set<String> schemas;
     @SerializedName("Operations")
-    private List<Scim2OperationMulti> operations;
+    private List<Scim2OperationSingle> operations;
 
-    public Scim2PatchOp()
+    public Scim2PatchOpSingle()
     {
         schemas = new HashSet<>();
         schemas.add(SCIM2_PATCH_OP);
@@ -36,12 +36,12 @@ public class Scim2PatchOp
         }
     }
 
-    public List<Scim2OperationMulti> getOperations()
+    public List<Scim2OperationSingle> getOperations()
     {
         return operations;
     }
 
-    public void setOperations(List<Scim2OperationMulti> operations)
+    public void setOperations(List<Scim2OperationSingle> operations)
     {
         this.operations = operations;
     }

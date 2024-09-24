@@ -9,7 +9,6 @@ import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.driver.rest.slack.Scim2SlackUsersInvocator;
 import com.exclamationlabs.connid.base.scim2.model.*;
-import com.exclamationlabs.connid.base.scim2.model.response.ListSlackUsersResponse;
 import com.exclamationlabs.connid.base.scim2.model.response.ListUsersResponse;
 import com.exclamationlabs.connid.base.scim2.model.slack.Scim2SlackUser;
 import org.identityconnectors.common.logging.Log;
@@ -21,13 +20,13 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
 {
     private static final Log LOG = Log.getLog(Scim2UsersInvocator.class);
 
-    public static List<Scim2Operation> addOperations(String name, List<Map<String, String>> add, List<Map<String, String>> remove) {
-        List<Scim2Operation> operations = new ArrayList<>();
+    public static List<Scim2OperationMulti> addOperations(String name, List<Map<String, String>> add, List<Map<String, String>> remove) {
+        List<Scim2OperationMulti> operations = new ArrayList<>();
         if (remove != null && !remove.isEmpty())
         {
             for (Map<String, String> item: remove)
             {
-                Scim2Operation op = new Scim2Operation();
+                Scim2OperationMulti op = new Scim2OperationMulti();
                 op.setOperation("remove");
                 String path = String.format("%s[value eq \"%s\"]", name, item.get("value"));
                 op.setPath(path);
@@ -35,7 +34,7 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
             }
         }
         if ( add != null && !add.isEmpty() ) {
-            Scim2Operation addOperation = new Scim2Operation();
+            Scim2OperationMulti addOperation = new Scim2OperationMulti();
             addOperation.setOperation("add");
             addOperation.setPath(name);
             addOperation.setValue(new ArrayList<>(add));
@@ -301,6 +300,46 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
         }
         else if (config.getEnableStandardSchema() || config.getEnableAWSSchema())
         {
+            Scim2User current = getOne(driver, userId, null);
+            user.setId(userId);
+            try
+            {
+                if (user.getUserName() == null || user.getUserName().isEmpty())
+                {
+                    user.setUserName(current.getUserName());
+                }
+                if (user.getName() == null)
+                {
+                    user.setName(current.getName());
+                }
+                else
+                {
+                    if (user.getName().getFamilyName() == null || user.getName().getFamilyName().isEmpty())
+                    {
+                        user.getName().setFamilyName(current.getName().getFamilyName());
+                    }
+                    if (user.getName().getGivenName() == null || user.getName().getGivenName().isEmpty())
+                    {
+                        user.getName().setGivenName(current.getName().getGivenName());
+                    }
+                }
+                if (user.getDisplayName() == null || user.getDisplayName().isEmpty())
+                {
+                    if (current.getDisplayName() == null || current.getDisplayName().isEmpty())
+                    {
+                        user.setDisplayName(current.getName().getGivenName() + " " + current.getName().getFamilyName());
+                    }
+                    else
+                    {
+                        user.setDisplayName(current.getDisplayName());
+                    }
+                }
+            }
+            catch ( Exception e)
+            {
+                LOG.error(e, "{0}", e.getMessage());
+            }
+
             RestRequest req = new RestRequest.Builder<>(Scim2User.class)
                     .withPut()
                     .withRequestUri(config.getUsersEndpointUrl() + "/" + userId)
@@ -324,7 +363,7 @@ public class Scim2UsersInvocator implements DriverInvocator<Scim2Driver, Scim2Us
         String url = driver.getConfiguration().getUsersEndpointUrl() + "/" + userId;
         Scim2PatchOp patchOp = new Scim2PatchOp();
         patchOp.setOperations(new ArrayList<>());
-        List<Scim2Operation> operations = new ArrayList<>();
+        List<Scim2OperationMulti> operations = new ArrayList<>();
         operations.addAll(addOperations("addresses", user.getAddressesAdded(), user.getAddressesRemoved()));
         operations.addAll(addOperations("emails", user.getEmailsAdded(), user.getEmailsRemoved()));
         operations.addAll(addOperations("entitlements", user.getEntitlementsAdded(), user.getEntitlementsRemoved()));

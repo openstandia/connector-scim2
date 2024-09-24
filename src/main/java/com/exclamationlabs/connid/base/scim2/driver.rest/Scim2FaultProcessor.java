@@ -36,13 +36,12 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
       Header responseType = httpResponse.getFirstHeader("Content-Type");
       String responseTypeValue = responseType.getValue();
       if (!StringUtils.contains(responseTypeValue, ContentType.APPLICATION_JSON.getMimeType())) {
-        // received non-JSON error response from Zoom unable to process
         String errorMessage = "Unable to parse response, not valid JSON: ";
         Logger.info(this, String.format("%s %s", errorMessage, rawResponse));
         throw new ConnectorException(errorMessage + rawResponse);
       }
 
-      handleFaultResponse(rawResponse, gsonBuilder);
+      handleFaultResponse(httpResponse.getStatusLine().getStatusCode(), rawResponse, gsonBuilder);
 
     } catch (IOException e) {
       throw new ConnectorException(
@@ -55,7 +54,7 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
     }
   }
 
-  private void handleFaultResponse(String rawResponse, GsonBuilder gsonBuilder) {
+  private void handleFaultResponse(Integer httpStatus, String rawResponse, GsonBuilder gsonBuilder) {
     Scim2ErrorResponse faultData = gsonBuilder.create().fromJson(rawResponse, Scim2ErrorResponse.class);
     if (faultData != null) {
       if (faultData.getStatus() != null) {
@@ -70,6 +69,12 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
           Logger.info(this, faultData.getDetail());
           return;
         }
+      }
+    }
+    else if ( httpStatus != null ) {
+      if ( httpStatus == HTTP_NOT_IMPLEMENTED ||  httpStatus == HTTP_NOT_FOUND)
+      {
+        return;
       }
     }
     throw new ConnectorException("Error received from Scim Backend." + rawResponse);
@@ -100,6 +105,8 @@ public class Scim2FaultProcessor implements RestFaultProcessor {
                 + error.getDetail());
       case HTTP_NOT_FOUND:
         // ignore fault and return to invocator
+        return false;
+      case HTTP_NOT_IMPLEMENTED:
         return false;
     }
     return true;

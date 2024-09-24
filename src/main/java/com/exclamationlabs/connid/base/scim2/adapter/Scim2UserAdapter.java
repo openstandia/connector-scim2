@@ -11,6 +11,7 @@ import com.exclamationlabs.connid.base.scim2.model.*;
 import java.util.*;
 
 import com.google.gson.Gson;
+import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.Attribute;
@@ -22,9 +23,10 @@ import static org.identityconnectors.framework.common.objects.AttributeInfo.Flag
 import static org.identityconnectors.framework.common.objects.AttributeInfo.Flags.NOT_RETURNED_BY_DEFAULT;
 
 public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration> {
+  private static final Log LOG = Log.getLog(Scim2UserAdapter.class);
   public static final String SCIM2_USER ="Scim2User";
   public static final String SCIM2_CORE_USER_SCHEMA ="urn:ietf:params:scim:schemas:core:2.0:User";
-  public static final String SCIM2_ENTERPRISE_USER_SCHEMA = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
+  public static final String SCIM2_ENTERPRISE_USER_SCHEMA = "urn:ietf:params:scim:schemas:extension:slack:profile:2.0:User";
   @Override
   public ObjectClass getType() {
     return new ObjectClass(SCIM2_USER);
@@ -86,10 +88,10 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
     result.add(new ConnectorAttribute(organization.name(), STRING));
     result.add(new ConnectorAttribute(division.name(), STRING));
     result.add(new ConnectorAttribute(department.name(), STRING));
-    result.add(new ConnectorAttribute(manager_value.name(), STRING, NOT_RETURNED_BY_DEFAULT));
-    result.add(new ConnectorAttribute(manager_displayName.name(), STRING, NOT_RETURNED_BY_DEFAULT));
-    result.add(new ConnectorAttribute(manager_ref.name(), STRING, NOT_RETURNED_BY_DEFAULT));
-    result.add(new ConnectorAttribute(manager_managerId.name(), STRING, NOT_RETURNED_BY_DEFAULT));
+    result.add(new ConnectorAttribute(manager_value.name(), STRING));
+    result.add(new ConnectorAttribute(manager_displayName.name(), STRING));
+    result.add(new ConnectorAttribute(manager_ref.name(), STRING));
+    result.add(new ConnectorAttribute(manager_managerId.name(), STRING));
     return result;
   }
 
@@ -737,8 +739,7 @@ public class Scim2UserAdapter extends BaseAdapter<Scim2User, Scim2Configuration>
 
     Scim2Configuration config = getConfiguration();
 
-    if (config.getEnableStandardSchema())
-    {
+    if (config.getEnableStandardSchema())    {
       // Standard
       user = new Scim2User();
       populateCoreUser(user,

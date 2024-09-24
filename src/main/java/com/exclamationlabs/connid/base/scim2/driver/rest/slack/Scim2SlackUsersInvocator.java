@@ -8,7 +8,7 @@ import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
 import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2Driver;
 import com.exclamationlabs.connid.base.scim2.driver.rest.Scim2UsersInvocator;
-import com.exclamationlabs.connid.base.scim2.model.Scim2Operation;
+import com.exclamationlabs.connid.base.scim2.model.Scim2OperationMulti;
 import com.exclamationlabs.connid.base.scim2.model.Scim2PatchOp;
 import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.exclamationlabs.connid.base.scim2.model.response.ListSlackUsersResponse;
@@ -197,7 +197,7 @@ public class Scim2SlackUsersInvocator implements DriverInvocator<Scim2Driver, Sc
     String url = driver.getConfiguration().getUsersEndpointUrl() + "/" + userId;
     Scim2PatchOp patchOp = new Scim2PatchOp();
     patchOp.setOperations(new ArrayList<>());
-    List<Scim2Operation> operations = new ArrayList<>();
+    List<Scim2OperationMulti> operations = new ArrayList<>();
     operations.addAll(Scim2UsersInvocator.addOperations("addresses", user.getAddressesAdded(), user.getAddressesRemoved()));
     operations.addAll(Scim2UsersInvocator.addOperations("emails", user.getEmailsAdded(), user.getEmailsRemoved()));
     operations.addAll(Scim2UsersInvocator.addOperations("groups", user.getGroupsAdded(), user.getGroupsRemoved()));

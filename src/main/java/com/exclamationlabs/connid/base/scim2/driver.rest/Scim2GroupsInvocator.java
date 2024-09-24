@@ -6,14 +6,11 @@ import com.exclamationlabs.connid.base.connector.driver.rest.RestResponseData;
 import com.exclamationlabs.connid.base.connector.results.ResultsFilter;
 import com.exclamationlabs.connid.base.connector.results.ResultsPaginator;
 import com.exclamationlabs.connid.base.scim2.configuration.Scim2Configuration;
-import com.exclamationlabs.connid.base.scim2.model.Scim2Group;
+import com.exclamationlabs.connid.base.scim2.model.*;
 
 import java.net.URLEncoder;
 import java.util.*;
 
-import com.exclamationlabs.connid.base.scim2.model.Scim2Operation;
-import com.exclamationlabs.connid.base.scim2.model.Scim2PatchOp;
-import com.exclamationlabs.connid.base.scim2.model.Scim2User;
 import com.exclamationlabs.connid.base.scim2.model.response.ListGroupResponse;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
@@ -183,13 +180,39 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
       throws ConnectorException {
     Scim2Configuration config = driver.getConfiguration();
     if ( model.getDisplayName() != null && model.getDisplayName().length() > 0 ) {
-      RestRequest req = new RestRequest.Builder<>(Scim2User.class)
-              .withPut()
-              .withRequestUri(config.getGroupsEndpointUrl() + "/" + groupId)
-              .withRequestBody(model)
-              .build();
-      RestResponseData<Scim2User> response = driver.executeRequest(req);
-      Scim2User updated = response.getResponseObject();
+      try
+      {
+        model.setId(groupId);
+        RestRequest req = new RestRequest.Builder<>(Scim2Group.class)
+                .withPut()
+                .withRequestUri(config.getGroupsEndpointUrl() + "/" + groupId)
+                .withRequestBody(model)
+                .build();
+        RestResponseData<Scim2Group> response = driver.executeRequest(req);
+        Scim2Group updated = response.getResponseObject();
+        if ( response.getResponseStatusCode() == 501) {
+          Scim2PatchOpSingle patchOp = new Scim2PatchOpSingle();
+          patchOp.setOperations(new ArrayList<>());
+          Scim2OperationSingle op = new Scim2OperationSingle();
+          op.setOperation("replace");
+          Map<String, String> valueMap = new HashMap<>();
+          valueMap.put("id", groupId);
+          valueMap.put("displayName", model.getDisplayName());
+          op.setValue(valueMap);
+          patchOp.getOperations().add(op);
+          req = new RestRequest.Builder<>(Scim2Group.class)
+                  .withPatch()
+                  .withRequestUri(config.getGroupsEndpointUrl() + "/" + groupId)
+                  .withRequestBody(patchOp)
+                  .build();
+          response = driver.executeRequest(req);
+          updated = response.getResponseObject();
+        }
+      }
+      catch ( Exception e )
+      {
+        LOG.error(e, "{0}", e.getMessage());
+      }
     }
     updateMembers(driver, groupId, model.getAddMembers(), model.getRemoveMembers());
   }
@@ -207,7 +230,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
     {
       for (Map<String, String>item: new ArrayList<>(remove))
       {
-        Scim2Operation op = new Scim2Operation();
+        Scim2OperationMulti op = new Scim2OperationMulti();
         op.setOperation("remove");
         String path = String.format("members[value eq \"%s\"]", item.get("value"));
         op.setPath(path);
@@ -217,7 +240,7 @@ public class Scim2GroupsInvocator implements DriverInvocator<Scim2Driver, Scim2G
     }
 
     if ( add != null && !add.isEmpty() ) {
-      Scim2Operation addOperation = new Scim2Operation();
+      Scim2OperationMulti addOperation = new Scim2OperationMulti();
       addOperation.setOperation("add");
       addOperation.setPath("members");
       addOperation.setValue(new ArrayList<>(add));

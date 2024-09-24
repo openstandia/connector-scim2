@@ -1,15 +1,27 @@
 package com.exclamationlabs.connid.base.scim2.model.slack;
 
-import java.util.Set;
+import java.util.List;
 
 public class SlackGuestUser {
-  private Set<SlackChannel> channels;
+  private List<SlackChannel> channels;
+  private transient List<SlackChannel> channelsAdded;
+  private transient List<SlackChannel> channelsRemoved;
   private String expiration;
   private String type;
 
-  public Set<SlackChannel> getChannels()
+  public List<SlackChannel> getChannels()
   {
     return channels;
+  }
+
+  public List<SlackChannel> getChannelsAdded()
+  {
+    return channelsAdded;
+  }
+
+  public List<SlackChannel> getChannelsRemoved()
+  {
+    return channelsRemoved;
   }
 
   public String getExpiration()
@@ -22,9 +34,19 @@ public class SlackGuestUser {
     return type;
   }
 
-  public void setChannels(Set<SlackChannel> channels)
+  public void setChannels(List<SlackChannel> channels)
   {
     this.channels = channels;
+  }
+
+  public void setChannelsAdded(List<SlackChannel> channelsAdded)
+  {
+    this.channelsAdded = channelsAdded;
+  }
+
+  public void setChannelsRemoved(List<SlackChannel> channelsRemoved)
+  {
+    this.channelsRemoved = channelsRemoved;
   }
 
   public void setExpiration(String expiration)
